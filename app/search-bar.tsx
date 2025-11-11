@@ -3,13 +3,18 @@
 import * as React from "react";
 import { Input } from "@base-ui-components/react";
 import { saveLinkToDB } from "@/lib/actions";
+import { useBookmarks } from "./bookmarks-provider";
 
 export function SearchBar() {
   const searchInputRef = React.useRef<HTMLInputElement>(null);
+  const { addOptimisticBookmark } = useBookmarks();
   const [state, action] = React.useActionState(saveLinkToDB, {
     success: false,
     message: "",
   });
+
+  // TODO: use this for displaying error state maybe?
+  console.log(state);
 
   React.useEffect(() => {
     const handleSearch = (e: KeyboardEvent) => {
@@ -27,8 +32,22 @@ export function SearchBar() {
     return () => document.removeEventListener("keydown", handleSearch);
   }, []);
 
+  const handleSubmit = (formData: FormData) => {
+    const url = formData.get("search") as string;
+
+    addOptimisticBookmark({
+      id: crypto.randomUUID(),
+      url: url.startsWith("http") ? url : `https://${url}`,
+      title: url,
+      favicon: null,
+      timeStamp: new Date(),
+    });
+
+    action(formData);
+  };
+
   return (
-    <form action={action}>
+    <form action={handleSubmit}>
       <Input
         ref={searchInputRef}
         name="search"

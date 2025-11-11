@@ -7,3 +7,5 @@ export const bookmarksTable = pgTable("bookmarks", {
   favicon: varchar({ length: 2048 }),
   timeStamp: timestamp().notNull().defaultNow(),
 });
+
+export type Bookmark = typeof bookmarksTable.$inferSelect;
