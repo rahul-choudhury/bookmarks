@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useOptimistic,
-  startTransition,
-} from "react";
+import { createContext, useContext, useOptimistic } from "react";
 import type { Bookmark } from "@/lib/db/schema";
 
 type BookmarksContextType = {
@@ -13,7 +8,9 @@ type BookmarksContextType = {
   addOptimisticBookmark: (bookmark: Bookmark) => void;
 };
 
-const BookmarksContext = createContext<BookmarksContextType | null>(null);
+export const BookmarksContext = createContext<BookmarksContextType | null>(
+  null,
+);
 
 export function BookmarksProvider({
   children,
@@ -27,24 +24,18 @@ export function BookmarksProvider({
     (state, newBookmark: Bookmark) => [
       ...state,
       { ...newBookmark, optimistic: true },
-    ]
+    ],
   );
 
-  const handleAddOptimistic = (bookmark: Bookmark) => {
-    startTransition(() => {
-      addOptimisticBookmark(bookmark);
-    });
-  };
-
   return (
-    <BookmarksContext.Provider
+    <BookmarksContext
       value={{
         bookmarks: optimisticBookmarks,
-        addOptimisticBookmark: handleAddOptimistic,
+        addOptimisticBookmark: (bookmark) => addOptimisticBookmark(bookmark),
       }}
     >
       {children}
-    </BookmarksContext.Provider>
+    </BookmarksContext>
   );
 }
 
