@@ -2,27 +2,11 @@
 
 import * as React from "react";
 import { Input } from "@base-ui-components/react";
-
-type Bookmark = {
-  link: string;
-  timeStamp: string;
-};
+import { saveLinkToDB } from "./actions";
 
 export default function Home() {
-  const [bookmarks, setBookmarks] = React.useState<Bookmark[]>([]);
+  const [state, action] = React.useActionState(saveLinkToDB, []);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = Object.fromEntries(new FormData(e.currentTarget));
-    setBookmarks((prev) => [
-      ...prev,
-      {
-        link: String(form.search),
-        timeStamp: new Date().toISOString(),
-      },
-    ]);
-  };
 
   React.useEffect(() => {
     const handleSearch = (e: KeyboardEvent) => {
@@ -42,7 +26,7 @@ export default function Home() {
 
   return (
     <div className="w-full max-w-4xl mx-auto p-8 space-y-4">
-      <form onSubmit={handleSubmit}>
+      <form action={action}>
         <Input
           ref={searchInputRef}
           name="search"
@@ -59,10 +43,17 @@ export default function Home() {
       </form>
 
       <ul className="space-y-2 text-sm">
-        {bookmarks.map(({ link, timeStamp }) => (
-          <li key={timeStamp} className="flex justify-between">
-            {link}
-            <p className="text-gray-500">
+        {state.map(({ url, title, favicon, timeStamp }) => (
+          <li key={timeStamp} className="flex items-center gap-3">
+            {favicon && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={favicon} alt="" className="size-4 shrink-0" />
+            )}
+            <a className="flex-1 min-w-0" href={url} target="_blank">
+              <p className="truncate">{title || url}</p>
+              <p className="text-xs text-gray-500 truncate">{url}</p>
+            </a>
+            <p className="text-gray-500 shrink-0">
               {new Date(timeStamp).toLocaleDateString()}
             </p>
           </li>
