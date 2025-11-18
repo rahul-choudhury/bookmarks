@@ -13,9 +13,6 @@ export function SearchBar() {
     message: "",
   });
 
-  // TODO: use this for displaying error state maybe?
-  console.log(state);
-
   React.useEffect(() => {
     const handleSearch = (e: KeyboardEvent) => {
       if (e.target === searchInputRef.current) {

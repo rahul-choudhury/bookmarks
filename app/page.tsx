@@ -3,12 +3,23 @@ import { SearchBar } from "./search-bar";
 import { BookmarkList } from "./bookmark-list";
 import { BookmarksProvider } from "./bookmarks-provider";
 import { db } from "@/lib/db";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { eq } from "drizzle-orm";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
+  const headersList = await headers();
+  const session = await auth.api.getSession({ headers: headersList });
+
+  if (!session) {
+    redirect("/login");
+  }
+
   const bookmarks = await db
     .select()
     .from(bookmarksTable)
-    .orderBy(bookmarksTable.timeStamp);
+    .where(eq(bookmarksTable.userId, session.user.id));
 
   return (
     <BookmarksProvider initialBookmarks={bookmarks}>
