@@ -1,6 +1,8 @@
 "use client";
 
+import { authClient } from "@/lib/auth-client";
 import { useBookmarks } from "./providers";
+import { redirect, RedirectType } from "next/navigation";
 
 export function TitleBar() {
   const { isManaging, setIsManaging } = useBookmarks();
@@ -24,16 +26,27 @@ export function TitleBar() {
         <h1 className="text-base font-medium text-gray-900">Bookmarks</h1>
       </div>
 
-      <button
-        className={`w-20 px-3 py-1 text-sm border hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 ring-offset-2 transition-colors ${
-          isManaging
-            ? "bg-blue-50 border-blue-300 text-blue-700"
-            : "border-gray-300"
-        }`}
-        onClick={() => setIsManaging((prev) => !prev)}
-      >
-        {isManaging ? "Done" : "Manage"}
-      </button>
+      <div className="space-x-2">
+        <button
+          className={`w-20 px-3 py-1 text-sm border hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 ring-offset-2 transition-colors ${
+            isManaging
+              ? "bg-blue-50 border-blue-300 text-blue-700"
+              : "border-gray-300"
+          }`}
+          onClick={() => setIsManaging((prev) => !prev)}
+        >
+          {isManaging ? "Done" : "Manage"}
+        </button>
+        <button
+          className="px-3 py-1 text-sm border hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 ring-offset-2 transition-colors border-gray-300"
+          onClick={() => {
+            authClient.signOut();
+            redirect("/login", RedirectType.replace);
+          }}
+        >
+          Sign Out
+        </button>
+      </div>
     </header>
   );
 }
