@@ -3,8 +3,8 @@ import { eq } from "drizzle-orm";
 import { bookmarksTable } from "@/lib/db/schema";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
-import { SearchBar } from "./search-bar";
-import { BookmarkList } from "./bookmark-list";
+import { SearchBar } from "@/components/search-bar";
+import { BookmarkList } from "@/components/bookmark-list";
 import { BookmarksProvider } from "@/components/providers";
 
 export default async function Home() {
