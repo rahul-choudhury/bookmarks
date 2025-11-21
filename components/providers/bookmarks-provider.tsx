@@ -1,23 +1,16 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useMemo,
-  useOptimistic,
-  useState,
-} from "react";
+import * as React from "react";
 import type { Bookmark } from "@/lib/db/schema";
 
 type BookmarksContextType = {
   bookmarks: Bookmark[];
-  searchTerm: (term: string) => void;
+  setSearchTerm: (term: string) => void;
   addOptimisticBookmark: (bookmark: Bookmark) => void;
 };
 
-export const BookmarksContext = createContext<BookmarksContextType | null>(
-  null,
-);
+export const BookmarksContext =
+  React.createContext<BookmarksContextType | null>(null);
 
 export function BookmarksProvider({
   children,
@@ -26,7 +19,7 @@ export function BookmarksProvider({
   children: React.ReactNode;
   initialBookmarks: Bookmark[];
 }) {
-  const [optimisticBookmarks, addOptimisticBookmark] = useOptimistic(
+  const [optimisticBookmarks, addOptimisticBookmark] = React.useOptimistic(
     initialBookmarks,
     (state, newBookmark: Bookmark) => [
       { ...newBookmark, optimistic: true },
@@ -34,14 +27,15 @@ export function BookmarksProvider({
     ],
   );
 
-  const [currSearchTerm, setCurrSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = React.useState("");
 
-  const bookmarks = useMemo(() => {
-    if (!currSearchTerm.trim()) {
+  const bookmarks = React.useMemo(() => {
+    if (!searchTerm.trim()) {
       return optimisticBookmarks;
     }
 
-    const lowerCaseSearchTerm = currSearchTerm.toLowerCase();
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
     return optimisticBookmarks.filter((bookmark) => {
       const titleMatch = bookmark.title
         ?.toLowerCase()
@@ -51,15 +45,11 @@ export function BookmarksProvider({
         .includes(lowerCaseSearchTerm);
       return titleMatch || urlMatch;
     });
-  }, [currSearchTerm, optimisticBookmarks]);
+  }, [searchTerm, optimisticBookmarks]);
 
   return (
     <BookmarksContext
-      value={{
-        bookmarks,
-        searchTerm: (term) => setCurrSearchTerm(term),
-        addOptimisticBookmark: (bookmark) => addOptimisticBookmark(bookmark),
-      }}
+      value={{ bookmarks, setSearchTerm, addOptimisticBookmark }}
     >
       {children}
     </BookmarksContext>
@@ -67,7 +57,7 @@ export function BookmarksProvider({
 }
 
 export function useBookmarks() {
-  const context = useContext(BookmarksContext);
+  const context = React.useContext(BookmarksContext);
   if (!context) {
     throw new Error("useBookmarks must be used within BookmarksProvider");
   }
