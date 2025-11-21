@@ -5,7 +5,9 @@ import type { Bookmark } from "@/lib/db/schema";
 
 type BookmarksContextType = {
   bookmarks: Bookmark[];
-  setSearchTerm: (term: string) => void;
+  isManaging: boolean;
+  setIsManaging: React.Dispatch<React.SetStateAction<boolean>>;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
   addOptimisticBookmark: (bookmark: Bookmark) => void;
 };
 
@@ -27,6 +29,7 @@ export function BookmarksProvider({
     ],
   );
 
+  const [isManaging, setIsManaging] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState("");
 
   const bookmarks = React.useMemo(() => {
@@ -49,7 +52,13 @@ export function BookmarksProvider({
 
   return (
     <BookmarksContext
-      value={{ bookmarks, setSearchTerm, addOptimisticBookmark }}
+      value={{
+        bookmarks,
+        isManaging,
+        setIsManaging,
+        setSearchTerm,
+        addOptimisticBookmark,
+      }}
     >
       {children}
     </BookmarksContext>
