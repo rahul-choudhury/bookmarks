@@ -53,6 +53,7 @@ export function SearchBar() {
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();
+            if (!isUrl(e.currentTarget.value)) return;
             setSearchTerm("");
             e.currentTarget.form?.requestSubmit();
           }
@@ -62,4 +63,10 @@ export function SearchBar() {
       />
     </form>
   );
+}
+
+function isUrl(url: string) {
+  const urlRegex = /^(https?:\/\/)|([\w-]+\.)+[\w-]+(\/.*)?$/i;
+  if (url.match(urlRegex)) return true;
+  return false;
 }
