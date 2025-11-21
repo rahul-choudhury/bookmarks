@@ -53,8 +53,8 @@ export function SearchBar() {
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();
-            e.currentTarget.form?.requestSubmit();
             setSearchTerm("");
+            e.currentTarget.form?.requestSubmit();
           }
         }}
         placeholder="Search or paste URL (Press '/' to focus)"

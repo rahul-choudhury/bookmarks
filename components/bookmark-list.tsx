@@ -49,7 +49,13 @@ export function BookmarkList() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="truncate">{title || url}</p>
-              <p className="text-xs text-gray-500 truncate">{url}</p>
+              <a
+                href={url}
+                target="_blank"
+                className="text-xs text-gray-500 truncate hover:underline"
+              >
+                {url}
+              </a>
             </div>
             <p className="text-gray-500 shrink-0">
               {new Date(timeStamp).toLocaleDateString("en-IN")}
