@@ -5,6 +5,7 @@ import type { Bookmark } from "@/lib/db/schema";
 
 type BookmarksContextType = {
   bookmarks: Bookmark[];
+  searchTerm: string;
   isManaging: boolean;
   setIsManaging: React.Dispatch<React.SetStateAction<boolean>>;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
@@ -54,6 +55,7 @@ export function BookmarksProvider({
     <BookmarksContext
       value={{
         bookmarks,
+        searchTerm,
         isManaging,
         setIsManaging,
         setSearchTerm,

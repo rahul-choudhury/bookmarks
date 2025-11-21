@@ -7,7 +7,38 @@ import { Input } from "@base-ui-components/react";
 import { useState } from "react";
 
 export function BookmarkList() {
-  const { bookmarks } = useBookmarks();
+  const { bookmarks, searchTerm } = useBookmarks();
+
+  if (bookmarks.length === 0 && searchTerm.trim()) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <p>No results found for &quot;{searchTerm}&quot;</p>
+        <p className="text-sm mt-2">
+          Press{" "}
+          <kbd className="px-2 py-1 text-xs bg-gray-100 border border-gray-300 rounded">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="inline-block mr-1"
+            >
+              <path d="M20 4v7a4 4 0 0 1-4 4H4" />
+              <path d="m9 10-5 5 5 5" />
+            </svg>
+            Enter
+          </kbd>{" "}
+          to add this link to your bookmarks
+        </p>
+      </div>
+    );
+  }
+
   return (
     <ul className="space-y-2 text-sm">
       {bookmarks.map((bookmark) => (
