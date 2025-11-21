@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { bookmarksTable } from "@/lib/db/schema";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
@@ -16,6 +16,7 @@ export default async function Home() {
   const bookmarks = await db
     .select()
     .from(bookmarksTable)
+    .orderBy(desc(bookmarksTable.timeStamp))
     .where(eq(bookmarksTable.userId, session.user.id));
 
   return (

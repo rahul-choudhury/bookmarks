@@ -1,10 +1,17 @@
 "use client";
 
-import { createContext, useContext, useOptimistic } from "react";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  useOptimistic,
+  useState,
+} from "react";
 import type { Bookmark } from "@/lib/db/schema";
 
 type BookmarksContextType = {
   bookmarks: Bookmark[];
+  searchTerm: (term: string) => void;
   addOptimisticBookmark: (bookmark: Bookmark) => void;
 };
 
@@ -22,15 +29,35 @@ export function BookmarksProvider({
   const [optimisticBookmarks, addOptimisticBookmark] = useOptimistic(
     initialBookmarks,
     (state, newBookmark: Bookmark) => [
-      ...state,
       { ...newBookmark, optimistic: true },
+      ...state,
     ],
   );
+
+  const [currSearchTerm, setCurrSearchTerm] = useState("");
+
+  const bookmarks = useMemo(() => {
+    if (!currSearchTerm.trim()) {
+      return optimisticBookmarks;
+    }
+
+    const lowerCaseSearchTerm = currSearchTerm.toLowerCase();
+    return optimisticBookmarks.filter((bookmark) => {
+      const titleMatch = bookmark.title
+        ?.toLowerCase()
+        .includes(lowerCaseSearchTerm);
+      const urlMatch = bookmark.url
+        ?.toLowerCase()
+        .includes(lowerCaseSearchTerm);
+      return titleMatch || urlMatch;
+    });
+  }, [currSearchTerm, optimisticBookmarks]);
 
   return (
     <BookmarksContext
       value={{
-        bookmarks: optimisticBookmarks,
+        bookmarks,
+        searchTerm: (term) => setCurrSearchTerm(term),
         addOptimisticBookmark: (bookmark) => addOptimisticBookmark(bookmark),
       }}
     >

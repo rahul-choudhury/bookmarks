@@ -7,7 +7,7 @@ import { useBookmarks } from "@/components/providers";
 
 export function SearchBar() {
   const searchInputRef = React.useRef<HTMLInputElement>(null);
-  const { addOptimisticBookmark } = useBookmarks();
+  const { searchTerm, addOptimisticBookmark } = useBookmarks();
   const [, action] = React.useActionState(saveLinkToDB, {
     success: false,
     message: "",
@@ -49,11 +49,12 @@ export function SearchBar() {
       <Input
         ref={searchInputRef}
         name="search"
+        onValueChange={searchTerm}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();
             e.currentTarget.form?.requestSubmit();
-            e.currentTarget.form?.reset();
+            searchTerm("");
           }
         }}
         placeholder="Search or paste URL (Press '/' to focus)"
