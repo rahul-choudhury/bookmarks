@@ -1,12 +1,12 @@
 "use server";
 
 import { unfurl } from "unfurl.js";
+import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
+import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { bookmarksTable } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 import { auth } from "./auth";
-import { headers } from "next/headers";
 
 export async function saveLinkToDB(state: unknown, formData: FormData) {
   const headerList = await headers();
@@ -26,15 +26,32 @@ export async function saveLinkToDB(state: unknown, formData: FormData) {
     url = "https://" + url;
   }
 
-  const result = await unfurl(url);
+  let result;
+
+  try {
+    result = await unfurl(url);
+  } catch {
+    return {
+      success: false,
+      message: "Failed to parse metadata from URL.",
+    };
+  }
+
   const { title, favicon } = result;
 
-  await db.insert(bookmarksTable).values({
-    url,
-    title: title || null,
-    favicon: favicon || null,
-    userId: session.user.id,
-  });
+  try {
+    await db.insert(bookmarksTable).values({
+      url,
+      title: title || null,
+      favicon: favicon || null,
+      userId: session.user.id,
+    });
+  } catch {
+    return {
+      success: false,
+      message: "Failed to insert data into DB.",
+    };
+  }
 
   revalidatePath("/");
 
@@ -55,27 +72,23 @@ export async function deleteBookmark(id: string) {
     };
   }
 
-  const bookmark = await db
-    .select()
-    .from(bookmarksTable)
-    .where(eq(bookmarksTable.id, id))
-    .limit(1);
+  const result = await db
+    .delete(bookmarksTable)
+    .where(
+      and(
+        eq(bookmarksTable.id, id),
+        eq(bookmarksTable.userId, session.user.id),
+      ),
+    )
+    .returning({ id: bookmarksTable.id });
 
-  if (bookmark.length === 0) {
+  if (result.length === 0) {
     return {
       success: false,
-      message: "Bookmark not found.",
+      message: "Bookmark not found or unauthorized.",
     };
   }
 
-  if (bookmark[0].userId !== session.user.id) {
-    return {
-      success: false,
-      message: "You can only delete your own bookmarks.",
-    };
-  }
-
-  await db.delete(bookmarksTable).where(eq(bookmarksTable.id, id));
   revalidatePath("/");
 
   return {
