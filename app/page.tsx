@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth";
 import { SearchBar } from "@/components/search-bar";
 import { BookmarkList } from "@/components/bookmark-list";
 import { BookmarksProvider } from "@/components/providers";
+import { TitleBar } from "@/components/title-bar";
 
 export default async function Home() {
   const headersList = await headers();
@@ -22,6 +23,7 @@ export default async function Home() {
   return (
     <BookmarksProvider initialBookmarks={bookmarks}>
       <div className="w-full max-w-4xl mx-auto p-8 space-y-4">
+        <TitleBar />
         <SearchBar />
         <BookmarkList />
       </div>
