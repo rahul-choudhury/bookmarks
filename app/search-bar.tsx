@@ -8,7 +8,7 @@ import { useBookmarks } from "./bookmarks-provider";
 export function SearchBar() {
   const searchInputRef = React.useRef<HTMLInputElement>(null);
   const { addOptimisticBookmark } = useBookmarks();
-  const [state, action] = React.useActionState(saveLinkToDB, {
+  const [, action] = React.useActionState(saveLinkToDB, {
     success: false,
     message: "",
   });
@@ -34,6 +34,7 @@ export function SearchBar() {
 
     addOptimisticBookmark({
       id: crypto.randomUUID(),
+      userId: "temp", // Will be replaced by server action
       url: url.startsWith("http") ? url : `https://${url}`,
       title: url,
       favicon: null,

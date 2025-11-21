@@ -51,7 +51,7 @@ export function BookmarkList() {
               <p className="text-xs text-gray-500 truncate">{url}</p>
             </div>
             <p className="text-gray-500 shrink-0">
-              {new Date(timeStamp).toLocaleDateString()}
+              {new Date(timeStamp).toLocaleDateString("en-IN")}
             </p>
           </li>
         );

@@ -1,20 +1,17 @@
+import { headers } from "next/headers";
+import { eq } from "drizzle-orm";
 import { bookmarksTable } from "@/lib/db/schema";
+import { db } from "@/lib/db";
+import { auth } from "@/lib/auth";
 import { SearchBar } from "./search-bar";
 import { BookmarkList } from "./bookmark-list";
 import { BookmarksProvider } from "./bookmarks-provider";
-import { db } from "@/lib/db";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
 
 export default async function Home() {
   const headersList = await headers();
   const session = await auth.api.getSession({ headers: headersList });
 
-  if (!session) {
-    redirect("/login");
-  }
+  if (!session) return null;
 
   const bookmarks = await db
     .select()
