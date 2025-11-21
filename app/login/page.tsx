@@ -14,7 +14,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background">
       <button
         onClick={handleGithubLogin}
-        className="flex items-center gap-3 px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+        className="flex items-center gap-3 px-6 py-3 bg-black text-white hover:bg-gray-800 transition-colors"
       >
         <svg
           role="img"

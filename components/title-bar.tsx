@@ -25,7 +25,7 @@ export function TitleBar() {
       </div>
 
       <button
-        className={`px-3 py-1 text-sm border rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+        className={`w-20 px-3 py-1 text-sm border hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 ring-offset-2 transition-colors ${
           isManaging
             ? "bg-blue-50 border-blue-300 text-blue-700"
             : "border-gray-300"
