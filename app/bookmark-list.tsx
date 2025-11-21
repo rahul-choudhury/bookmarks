@@ -1,6 +1,6 @@
 "use client";
 
-import { useBookmarks } from "./bookmarks-provider";
+import { useBookmarks } from "@/components/providers";
 
 export function BookmarkList() {
   const { bookmarks } = useBookmarks();

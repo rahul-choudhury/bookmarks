@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { SearchBar } from "./search-bar";
 import { BookmarkList } from "./bookmark-list";
-import { BookmarksProvider } from "./bookmarks-provider";
+import { BookmarksProvider } from "@/components/providers";
 
 export default async function Home() {
   const headersList = await headers();

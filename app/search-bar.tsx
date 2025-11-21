@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Input } from "@base-ui-components/react";
 import { saveLinkToDB } from "@/lib/actions";
-import { useBookmarks } from "./bookmarks-provider";
+import { useBookmarks } from "@/components/providers";
 
 export function SearchBar() {
   const searchInputRef = React.useRef<HTMLInputElement>(null);
@@ -12,6 +12,21 @@ export function SearchBar() {
     success: false,
     message: "",
   });
+
+  const handleSubmit = (formData: FormData) => {
+    const url = formData.get("search") as string;
+
+    addOptimisticBookmark({
+      id: crypto.randomUUID(),
+      userId: "temp", // Will be replaced by server action
+      url: url.startsWith("http") ? url : `https://${url}`,
+      title: url,
+      favicon: null,
+      timeStamp: new Date(),
+    });
+
+    action(formData);
+  };
 
   React.useEffect(() => {
     const handleSearch = (e: KeyboardEvent) => {
@@ -28,21 +43,6 @@ export function SearchBar() {
     document.addEventListener("keydown", handleSearch);
     return () => document.removeEventListener("keydown", handleSearch);
   }, []);
-
-  const handleSubmit = (formData: FormData) => {
-    const url = formData.get("search") as string;
-
-    addOptimisticBookmark({
-      id: crypto.randomUUID(),
-      userId: "temp", // Will be replaced by server action
-      url: url.startsWith("http") ? url : `https://${url}`,
-      title: url,
-      favicon: null,
-      timeStamp: new Date(),
-    });
-
-    action(formData);
-  };
 
   return (
     <form action={handleSubmit}>
