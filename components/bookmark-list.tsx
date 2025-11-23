@@ -1,10 +1,10 @@
 "use client";
 
-import { useBookmarks } from "@/components/providers";
-import { deleteBookmark } from "@/lib/actions";
-import { Bookmark } from "@/lib/db/schema";
-import { Input } from "@base-ui-components/react";
 import { useState } from "react";
+import { Input } from "@base-ui-components/react";
+import { useBookmarks } from "@/components/providers";
+import { deleteBookmark, updateName } from "@/lib/actions";
+import { Bookmark } from "@/lib/db/schema";
 
 export function BookmarkList() {
   const { bookmarks, searchTerm } = useBookmarks();
@@ -94,9 +94,17 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
       <div className="flex-1 flex items-center gap-2 justify-between min-w-0">
         {isEditing ? (
           <Input
+            autoFocus
             className="h-8 p-1 border w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 ring-offset-2"
             defaultValue={title || url}
-            autoFocus
+            onBlur={() => setIsEditing(false)}
+            onKeyDown={async (e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                await updateName(id, e.currentTarget.value);
+                setIsEditing(false);
+              }
+            }}
           />
         ) : (
           <a

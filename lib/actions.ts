@@ -7,6 +7,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { bookmarksTable } from "@/lib/db/schema";
 import { auth } from "./auth";
+import { success } from "better-auth";
 
 export async function saveLinkToDB(state: unknown, formData: FormData) {
   const headerList = await headers();
@@ -72,20 +73,27 @@ export async function deleteBookmark(id: string) {
     };
   }
 
-  const result = await db
-    .delete(bookmarksTable)
-    .where(
-      and(
-        eq(bookmarksTable.id, id),
-        eq(bookmarksTable.userId, session.user.id),
-      ),
-    )
-    .returning({ id: bookmarksTable.id });
+  try {
+    const result = await db
+      .delete(bookmarksTable)
+      .where(
+        and(
+          eq(bookmarksTable.id, id),
+          eq(bookmarksTable.userId, session.user.id),
+        ),
+      )
+      .returning({ id: bookmarksTable.id });
 
-  if (result.length === 0) {
+    if (result.length === 0) {
+      return {
+        success: false,
+        message: "Bookmark not found or unauthorized.",
+      };
+    }
+  } catch {
     return {
       success: false,
-      message: "Bookmark not found or unauthorized.",
+      message: "Failed to delete bookmark.",
     };
   }
 
@@ -95,4 +103,43 @@ export async function deleteBookmark(id: string) {
     success: true,
     message: "Bookmark deleted.",
   };
+}
+
+export async function updateName(id: string, title: string) {
+  const headerList = await headers();
+  const session = await auth.api.getSession({ headers: headerList });
+
+  if (!session) {
+    return {
+      success: false,
+      message: "Not Authenticated.",
+    };
+  }
+
+  try {
+    const result = await db
+      .update(bookmarksTable)
+      .set({ title })
+      .where(
+        and(
+          eq(bookmarksTable.id, id),
+          eq(bookmarksTable.userId, session.user.id),
+        ),
+      )
+      .returning({ id: bookmarksTable.id });
+
+    if (result.length === 0) {
+      return {
+        success: false,
+        message: "Bookmark not found or unauthorized.",
+      };
+    }
+  } catch {
+    return {
+      success: false,
+      message: "Failed to update bookmark.",
+    };
+  }
+
+  revalidatePath("/");
 }
