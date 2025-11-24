@@ -49,7 +49,8 @@ export function BookmarkList() {
 }
 
 function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
-  const { isManaging } = useBookmarks();
+  const { isManaging, updateOptimisticBookmark, deleteOptimisticBookmark } =
+    useBookmarks();
   const { id, url, title, favicon, timeStamp } = bookmark;
 
   const isOptimistic = "optimistic" in bookmark;
@@ -101,8 +102,10 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
             onKeyDown={async (e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
-                await updateName(id, e.currentTarget.value);
+                const newTitle = e.currentTarget.value;
+                updateOptimisticBookmark(id, newTitle);
                 setIsEditing(false);
+                await updateName(id, newTitle);
               }
             }}
           />
@@ -147,6 +150,7 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
             className="p-1 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors flex items-center justify-center h-7 w-7 border border-gray-200"
             aria-label="Delete bookmark"
             onClick={async () => {
+              deleteOptimisticBookmark(id);
               await deleteBookmark(id);
             }}
           >

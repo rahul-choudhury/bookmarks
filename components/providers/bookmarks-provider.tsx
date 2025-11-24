@@ -10,10 +10,17 @@ type BookmarksContextType = {
   setIsManaging: React.Dispatch<React.SetStateAction<boolean>>;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
   addOptimisticBookmark: (bookmark: Bookmark) => void;
+  updateOptimisticBookmark: (id: string, title: string) => void;
+  deleteOptimisticBookmark: (id: string) => void;
 };
 
 export const BookmarksContext =
   React.createContext<BookmarksContextType | null>(null);
+
+type Action =
+  | { type: "ADD"; bookmark: Bookmark }
+  | { type: "UPDATE"; id: string; title: string }
+  | { type: "DELETE"; id: string };
 
 export function BookmarksProvider({
   children,
@@ -22,13 +29,39 @@ export function BookmarksProvider({
   children: React.ReactNode;
   initialBookmarks: Bookmark[];
 }) {
-  const [optimisticBookmarks, addOptimisticBookmark] = React.useOptimistic(
+  const [optimisticBookmarks, dispatchOptimistic] = React.useOptimistic(
     initialBookmarks,
-    (state, newBookmark: Bookmark) => [
-      { ...newBookmark, optimistic: true },
-      ...state,
-    ],
+    (state, action: Action) => {
+      switch (action.type) {
+        case "ADD":
+          return [{ ...action.bookmark, optimistic: true }, ...state];
+        case "UPDATE":
+          return state.map((item) =>
+            item.id === action.id
+              ? { ...item, title: action.title, optimistic: true }
+              : item,
+          );
+        case "DELETE":
+          return state.filter((item) => item.id !== action.id);
+      }
+    },
   );
+
+  const addOptimisticBookmark = (bookmark: Bookmark) => {
+    dispatchOptimistic({ type: "ADD", bookmark });
+  };
+
+  const updateOptimisticBookmark = (id: string, title: string) => {
+    React.startTransition(() => {
+      dispatchOptimistic({ type: "UPDATE", id, title });
+    });
+  };
+
+  const deleteOptimisticBookmark = (id: string) => {
+    React.startTransition(() => {
+      dispatchOptimistic({ type: "DELETE", id });
+    });
+  };
 
   const [isManaging, setIsManaging] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -60,6 +93,8 @@ export function BookmarksProvider({
         setIsManaging,
         setSearchTerm,
         addOptimisticBookmark,
+        updateOptimisticBookmark,
+        deleteOptimisticBookmark,
       }}
     >
       {children}
