@@ -98,7 +98,12 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
             autoFocus
             className="h-8 p-1 border w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 ring-offset-2"
             defaultValue={title || url}
-            onBlur={() => setIsEditing(false)}
+            onBlur={async (e) => {
+              const newTitle = e.currentTarget.value;
+              updateOptimisticBookmark(id, newTitle);
+              setIsEditing(false);
+              await updateName(id, newTitle);
+            }}
             onKeyDown={async (e) => {
               if (e.key === "Enter") {
                 e.preventDefault();

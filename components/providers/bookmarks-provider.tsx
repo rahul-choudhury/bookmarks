@@ -37,9 +37,7 @@ export function BookmarksProvider({
           return [{ ...action.bookmark, optimistic: true }, ...state];
         case "UPDATE":
           return state.map((item) =>
-            item.id === action.id
-              ? { ...item, title: action.title }
-              : item,
+            item.id === action.id ? { ...item, title: action.title } : item,
           );
         case "DELETE":
           return state.filter((item) => item.id !== action.id);
@@ -48,7 +46,9 @@ export function BookmarksProvider({
   );
 
   const addOptimisticBookmark = (bookmark: Bookmark) => {
-    dispatchOptimistic({ type: "ADD", bookmark });
+    React.startTransition(() => {
+      dispatchOptimistic({ type: "ADD", bookmark });
+    });
   };
 
   const updateOptimisticBookmark = (id: string, title: string) => {

@@ -8,7 +8,7 @@ import { db } from "@/lib/db";
 import { bookmarksTable } from "@/lib/db/bookmarks";
 import { auth } from "./auth";
 
-export async function saveLinkToDB(state: unknown, formData: FormData) {
+export async function saveLinkToDB(state: unknown, url: string) {
   const headerList = await headers();
   const session = await auth.api.getSession({ headers: headerList });
 
@@ -18,9 +18,6 @@ export async function saveLinkToDB(state: unknown, formData: FormData) {
       message: "Not Authenticated.",
     };
   }
-
-  const form = Object.fromEntries(formData);
-  let url = form.search as string;
 
   if (!url.startsWith("http://") && !url.startsWith("https://")) {
     url = "https://" + url;

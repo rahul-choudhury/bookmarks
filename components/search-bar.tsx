@@ -7,26 +7,13 @@ import { useBookmarks } from "@/components/providers/bookmarks-provider";
 
 export function SearchBar() {
   const searchInputRef = React.useRef<HTMLInputElement>(null);
-  const { setSearchTerm, addOptimisticBookmark } = useBookmarks();
+  const { searchTerm, setSearchTerm, addOptimisticBookmark } = useBookmarks();
+
+  // TODO: do something about the state
   const [, action] = React.useActionState(saveLinkToDB, {
     success: false,
     message: "",
   });
-
-  const handleSubmit = (formData: FormData) => {
-    const url = formData.get("search") as string;
-
-    addOptimisticBookmark({
-      id: crypto.randomUUID(),
-      userId: "temp", // Will be replaced by server action
-      url: url.startsWith("http") ? url : `https://${url}`,
-      title: url,
-      favicon: null,
-      timeStamp: new Date(),
-    });
-
-    action(formData);
-  };
 
   React.useEffect(() => {
     const handleSearch = (e: KeyboardEvent) => {
@@ -45,23 +32,37 @@ export function SearchBar() {
   }, []);
 
   return (
-    <form action={handleSubmit}>
-      <Input
-        ref={searchInputRef}
-        name="search"
-        onValueChange={setSearchTerm}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            if (!isUrl(e.currentTarget.value)) return;
-            setSearchTerm("");
-            e.currentTarget.form?.requestSubmit();
-          }
-        }}
-        placeholder="Search or paste URL (Press '/' to focus)"
-        className="w-full px-4 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 ring-offset-2"
-      />
-    </form>
+    <Input
+      ref={searchInputRef}
+      name="search"
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+
+          if (!isUrl(searchTerm)) return;
+          setSearchTerm("");
+
+          addOptimisticBookmark({
+            id: crypto.randomUUID(),
+            userId: "temp", // TODO: should i leave temp or add the actual id from session?
+            url: searchTerm.startsWith("http")
+              ? searchTerm
+              : `https://${searchTerm}`,
+            title: searchTerm,
+            favicon: null,
+            timeStamp: new Date(),
+          });
+
+          React.startTransition(() => {
+            action(searchTerm);
+          });
+        }
+      }}
+      placeholder="Search or paste URL (Press '/' to focus)"
+      className="w-full px-4 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 ring-offset-2"
+    />
   );
 }
 
