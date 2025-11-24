@@ -7,7 +7,6 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { bookmarksTable } from "@/lib/db/bookmarks";
 import { auth } from "./auth";
-import { success } from "better-auth";
 
 export async function saveLinkToDB(state: unknown, formData: FormData) {
   const headerList = await headers();
