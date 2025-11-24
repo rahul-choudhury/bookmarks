@@ -9,6 +9,12 @@ bun run db:push      # Push schema to DB (dev)
 bun run db:migrate   # Run migrations
 ```
 
+## Development Rules
+
+- **NEVER** run `bun dev` unless explicitly requested by the user
+- **NEVER** run `bun run build` unless explicitly requested by the user
+- Only run lint/typecheck commands to verify code correctness after changes
+
 ## Environment Variables
 
 - `DATABASE_URL` - PostgreSQL connection
@@ -31,15 +37,17 @@ bun run db:migrate   # Run migrations
 
 **State Management** (`components/providers/bookmarks-provider.tsx`):
 
-- React 19 `useOptimistic` for instant bookmark updates
+- React 19 `useOptimistic` reducer for instant bookmark updates
+- Optimistic actions: `ADD`, `UPDATE`, `DELETE` (all show 50% opacity)
 - Manages `searchTerm` (case-insensitive filtering on title/URL)
 - Manages `isManaging` (toggle edit/delete UI)
-- Exports `useBookmarks` hook
+- Exports `useBookmarks` hook with optimistic actions
 
 **Server Actions** (`lib/actions.ts`):
 
 - `saveLinkToDB` - Validates session, unfurls URL metadata via `unfurl.js`, saves with userId, revalidates
 - `deleteBookmark` - Validates session + ownership, deletes, revalidates
+- `updateName` - Validates session + ownership, updates title, revalidates
 
 ## Key Files
 
@@ -56,6 +64,13 @@ bun run db:migrate   # Run migrations
 3. User enters URL in SearchBar → `saveLinkToDB` → unfurls metadata → DB insert
 4. Optimistic update shows bookmark immediately (50% opacity)
 5. `revalidatePath("/")` syncs server state
+
+## Optimistic Updates
+
+- **Add**: `addOptimisticBookmark` immediately shows new bookmark with 50% opacity
+- **Edit**: `updateOptimisticBookmark` immediately updates title with 50% opacity
+- **Delete**: `deleteOptimisticBookmark` immediately removes bookmark from list
+- All optimistic updates are resolved when server action completes and `revalidatePath("/")` refreshes data
 
 ## Tech Notes
 
