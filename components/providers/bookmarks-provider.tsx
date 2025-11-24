@@ -38,7 +38,7 @@ export function BookmarksProvider({
         case "UPDATE":
           return state.map((item) =>
             item.id === action.id
-              ? { ...item, title: action.title, optimistic: true }
+              ? { ...item, title: action.title }
               : item,
           );
         case "DELETE":
