@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { SearchBar } from "@/components/search-bar";
 import { BookmarkList } from "@/components/bookmark-list";
-import { BookmarksProvider } from "@/components/providers";
+import { BookmarksProvider } from "@/components/providers/bookmarks-provider";
 import { TitleBar } from "@/components/title-bar";
 
 export default async function Home() {

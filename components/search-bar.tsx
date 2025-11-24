@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Input } from "@base-ui-components/react";
 import { saveLinkToDB } from "@/lib/actions";
-import { useBookmarks } from "@/components/providers";
+import { useBookmarks } from "@/components/providers/bookmarks-provider";
 
 export function SearchBar() {
   const searchInputRef = React.useRef<HTMLInputElement>(null);

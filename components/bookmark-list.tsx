@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Input } from "@base-ui-components/react";
-import { useBookmarks } from "@/components/providers";
+import { useBookmarks } from "@/components/providers/bookmarks-provider";
 import { deleteBookmark, updateName } from "@/lib/actions";
 import { Bookmark } from "@/lib/db/bookmarks";
 

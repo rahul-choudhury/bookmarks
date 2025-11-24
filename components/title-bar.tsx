@@ -1,7 +1,7 @@
 "use client";
 
 import { authClient } from "@/lib/auth-client";
-import { useBookmarks } from "./providers";
+import { useBookmarks } from "./providers/bookmarks-provider";
 import { redirect, RedirectType } from "next/navigation";
 
 export function TitleBar() {
