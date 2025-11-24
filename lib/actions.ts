@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { bookmarksTable } from "@/lib/db/schema";
+import { bookmarksTable } from "@/lib/db/bookmarks";
 import { auth } from "./auth";
 import { success } from "better-auth";
 

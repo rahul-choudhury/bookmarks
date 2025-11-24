@@ -17,7 +17,7 @@ bun run db:migrate   # Run migrations
 
 ## Core Architecture
 
-**Database** (`lib/db/schema.ts`, `auth-schema.ts`):
+**Database** (`lib/db/bookmarks.ts`, `auth-schema.ts`):
 
 - Bookmarks table: `id`, `url`, `title`, `favicon`, `timeStamp`, `userId` (FK to user, CASCADE delete)
 - Auth tables: user, session, account, verification (managed by Better Auth)

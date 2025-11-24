@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import type { Bookmark } from "@/lib/db/schema";
+import type { Bookmark } from "@/lib/db/bookmarks";
 
 type BookmarksContextType = {
   bookmarks: Bookmark[];

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Input } from "@base-ui-components/react";
 import { useBookmarks } from "@/components/providers";
 import { deleteBookmark, updateName } from "@/lib/actions";
-import { Bookmark } from "@/lib/db/schema";
+import { Bookmark } from "@/lib/db/bookmarks";
 
 export function BookmarkList() {
   const { bookmarks, searchTerm } = useBookmarks();

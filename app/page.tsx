@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { desc, eq } from "drizzle-orm";
-import { bookmarksTable } from "@/lib/db/schema";
+import { bookmarksTable } from "@/lib/db/bookmarks";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { SearchBar } from "@/components/search-bar";
