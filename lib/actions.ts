@@ -9,8 +9,8 @@ import { bookmarksTable } from "@/lib/db/bookmarks";
 import { auth } from "./auth";
 
 export async function saveLinkToDB(state: unknown, url: string) {
-  const headerList = await headers();
-  const session = await auth.api.getSession({ headers: headerList });
+  const headersList = await headers();
+  const session = await auth.api.getSession({ headers: headersList });
 
   if (!session) {
     return {
@@ -59,8 +59,8 @@ export async function saveLinkToDB(state: unknown, url: string) {
 }
 
 export async function deleteBookmark(id: string) {
-  const headerList = await headers();
-  const session = await auth.api.getSession({ headers: headerList });
+  const headersList = await headers();
+  const session = await auth.api.getSession({ headers: headersList });
 
   if (!session) {
     return {
@@ -102,8 +102,8 @@ export async function deleteBookmark(id: string) {
 }
 
 export async function updateName(id: string, title: string) {
-  const headerList = await headers();
-  const session = await auth.api.getSession({ headers: headerList });
+  const headersList = await headers();
+  const session = await auth.api.getSession({ headers: headersList });
 
   if (!session) {
     return {
