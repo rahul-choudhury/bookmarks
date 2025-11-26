@@ -9,8 +9,7 @@ export function SearchBar() {
   const searchInputRef = React.useRef<HTMLInputElement>(null);
   const { searchTerm, setSearchTerm, addOptimisticBookmark } = useBookmarks();
 
-  // TODO: do something about the state
-  const [, action] = React.useActionState(saveLinkToDB, {
+  const [state, action] = React.useActionState(saveLinkToDB, {
     success: false,
     message: "",
   });
@@ -32,37 +31,42 @@ export function SearchBar() {
   }, []);
 
   return (
-    <Input
-      ref={searchInputRef}
-      name="search"
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
+    <div className="space-y-2">
+      <Input
+        ref={searchInputRef}
+        name="search"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
 
-          if (!isUrl(searchTerm)) return;
-          setSearchTerm("");
+            if (!isUrl(searchTerm)) return;
+            setSearchTerm("");
 
-          addOptimisticBookmark({
-            id: crypto.randomUUID(),
-            userId: "temp", // TODO: should i leave temp or add the actual id from session?
-            url: searchTerm.startsWith("http")
-              ? searchTerm
-              : `https://${searchTerm}`,
-            title: searchTerm,
-            favicon: null,
-            timeStamp: new Date(),
-          });
+            addOptimisticBookmark({
+              id: crypto.randomUUID(),
+              userId: "temp", // TODO: should i leave temp or add the actual id from session?
+              url: searchTerm.startsWith("http")
+                ? searchTerm
+                : `https://${searchTerm}`,
+              title: searchTerm,
+              favicon: null,
+              timeStamp: new Date(),
+            });
 
-          React.startTransition(() => {
-            action(searchTerm);
-          });
-        }
-      }}
-      placeholder="Search or paste URL (Press '/' to focus)"
-      className="w-full px-4 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 ring-offset-2"
-    />
+            React.startTransition(() => {
+              action(searchTerm);
+            });
+          }
+        }}
+        placeholder="Search or paste URL (Press '/' to focus)"
+        className="w-full px-4 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 ring-offset-2"
+      />
+      {!state.success && state.message && (
+        <p className="text-red-500 text-sm">{state.message}</p>
+      )}
+    </div>
   );
 }
 

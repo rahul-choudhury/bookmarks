@@ -30,7 +30,8 @@ export async function saveLinkToDB(state: unknown, url: string) {
   } catch {
     return {
       success: false,
-      message: "Failed to parse metadata from URL.",
+      message:
+        "Failed to obtain link information. Make sure the link is publicly accessible.",
     };
   }
 
@@ -46,7 +47,7 @@ export async function saveLinkToDB(state: unknown, url: string) {
   } catch {
     return {
       success: false,
-      message: "Failed to insert data into DB.",
+      message: "Failed to record data into the database. Try again later.",
     };
   }
 
