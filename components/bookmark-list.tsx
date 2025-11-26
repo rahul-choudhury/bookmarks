@@ -100,6 +100,12 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
             defaultValue={title || url}
             onBlur={async (e) => {
               const newTitle = e.currentTarget.value;
+
+              if (newTitle === bookmark.title) {
+                setIsEditing(false);
+                return;
+              }
+
               updateOptimisticBookmark(id, newTitle);
               setIsEditing(false);
               await updateName(id, newTitle);
