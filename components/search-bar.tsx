@@ -7,7 +7,8 @@ import { useBookmarks } from "@/components/providers/bookmarks-provider";
 
 export function SearchBar() {
   const searchInputRef = React.useRef<HTMLInputElement>(null);
-  const { searchTerm, setSearchTerm, addOptimisticBookmark } = useBookmarks();
+  const { bookmarks, searchTerm, setSearchTerm, addOptimisticBookmark } =
+    useBookmarks();
 
   const [state, action] = React.useActionState(saveLinkToDB, {
     success: false,
@@ -42,6 +43,8 @@ export function SearchBar() {
             e.preventDefault();
 
             if (!isUrl(searchTerm)) return;
+            if (bookmarks.length > 0) return; // early return if duplicate link is found
+
             setSearchTerm("");
 
             addOptimisticBookmark({

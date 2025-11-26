@@ -23,6 +23,23 @@ export async function saveLinkToDB(state: unknown, url: string) {
     url = "https://" + url;
   }
 
+  const existing = await db
+    .select({ id: bookmarksTable.id })
+    .from(bookmarksTable)
+    .where(
+      and(
+        eq(bookmarksTable.url, url),
+        eq(bookmarksTable.userId, session.user.id),
+      ),
+    );
+
+  if (existing.length > 0) {
+    return {
+      success: false,
+      message: "Bookmark already exists.",
+    };
+  }
+
   let result;
 
   try {
