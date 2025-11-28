@@ -129,9 +129,11 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
             {title || url}
           </a>
         )}
-        <p className="text-xs text-gray-500">[{new URL(url).hostname}]</p>
+        <p className="text-xs text-gray-500 hidden md:block">
+          [{new URL(url).hostname}]
+        </p>
       </div>
-      <p className="text-gray-500 shrink-0">
+      <p className="text-gray-500 shrink-0 hidden md:block">
         {new Date(timeStamp).toLocaleDateString("en-IN")}
       </p>
 
