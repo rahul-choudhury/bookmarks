@@ -1,4 +1,4 @@
-import { user } from "@/auth-schema";
+import { user } from "./auth-schema";
 import { pgTable, timestamp, uuid, text, unique } from "drizzle-orm/pg-core";
 
 export const bookmarksTable = pgTable(
