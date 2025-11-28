@@ -12,10 +12,7 @@ export function SearchBar() {
   const { bookmarks, searchTerm, setSearchTerm, addOptimisticBookmark } =
     useBookmarks();
 
-  const [state, action] = React.useActionState(saveLinkToDB, {
-    success: false,
-    message: "",
-  });
+  const [state, action] = React.useActionState(saveLinkToDB, null);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Escape") {
@@ -79,7 +76,7 @@ export function SearchBar() {
         placeholder="Search or paste URL (Press '/' to focus)"
         className="w-full px-4 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 ring-offset-2"
       />
-      {!state.success && state.message && (
+      {state && !state.success && state.message && (
         <p className="text-red-500 text-sm">{state.message}</p>
       )}
     </div>

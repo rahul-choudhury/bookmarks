@@ -2,22 +2,14 @@
 
 import { unfurl } from "unfurl.js";
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { bookmarksTable } from "@/lib/db/bookmarks";
-import { auth } from "./auth";
+import { verifySession } from "./dal";
 
 export async function saveLinkToDB(state: unknown, url: string) {
-  const headersList = await headers();
-  const session = await auth.api.getSession({ headers: headersList });
-
-  if (!session) {
-    return {
-      success: false,
-      message: "Not Authenticated.",
-    };
-  }
+  const session = await verifySession();
+  if (!session) return null;
 
   if (!url.startsWith("http://") && !url.startsWith("https://")) {
     url = "https://" + url;
@@ -29,7 +21,7 @@ export async function saveLinkToDB(state: unknown, url: string) {
     .where(
       and(
         eq(bookmarksTable.url, url),
-        eq(bookmarksTable.userId, session.user.id),
+        eq(bookmarksTable.userId, session.userId),
       ),
     );
 
@@ -59,7 +51,7 @@ export async function saveLinkToDB(state: unknown, url: string) {
       url,
       title: title || null,
       favicon: favicon || null,
-      userId: session.user.id,
+      userId: session.userId,
     });
   } catch {
     return {
@@ -77,15 +69,8 @@ export async function saveLinkToDB(state: unknown, url: string) {
 }
 
 export async function deleteBookmark(id: string) {
-  const headersList = await headers();
-  const session = await auth.api.getSession({ headers: headersList });
-
-  if (!session) {
-    return {
-      success: false,
-      message: "Not Authenticated.",
-    };
-  }
+  const session = await verifySession();
+  if (!session) return null;
 
   try {
     const result = await db
@@ -93,7 +78,7 @@ export async function deleteBookmark(id: string) {
       .where(
         and(
           eq(bookmarksTable.id, id),
-          eq(bookmarksTable.userId, session.user.id),
+          eq(bookmarksTable.userId, session.userId),
         ),
       )
       .returning({ id: bookmarksTable.id });
@@ -120,15 +105,8 @@ export async function deleteBookmark(id: string) {
 }
 
 export async function updateName(id: string, title: string) {
-  const headersList = await headers();
-  const session = await auth.api.getSession({ headers: headersList });
-
-  if (!session) {
-    return {
-      success: false,
-      message: "Not Authenticated.",
-    };
-  }
+  const session = await verifySession();
+  if (!session) return null;
 
   try {
     const result = await db
@@ -137,7 +115,7 @@ export async function updateName(id: string, title: string) {
       .where(
         and(
           eq(bookmarksTable.id, id),
-          eq(bookmarksTable.userId, session.user.id),
+          eq(bookmarksTable.userId, session.userId),
         ),
       )
       .returning({ id: bookmarksTable.id });
