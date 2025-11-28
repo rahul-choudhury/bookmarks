@@ -17,7 +17,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="min-h-svh flex items-center justify-center bg-background">
       <div className="flex flex-col gap-4">
         <button
           onClick={handleGithubLogin}
