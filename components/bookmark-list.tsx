@@ -11,7 +11,7 @@ export function BookmarkList() {
 
   if (bookmarks.length === 0 && searchTerm.trim()) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-gray-500 text-sm md:text-base">
         <p>No results found for &quot;{searchTerm}&quot;</p>
         <p className="text-sm mt-2">
           Press{" "}
