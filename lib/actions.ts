@@ -134,4 +134,9 @@ export async function updateName(id: string, title: string) {
   }
 
   revalidatePath("/");
+
+  return {
+    success: true,
+    message: "Bookmark title updated successfully.",
+  };
 }
