@@ -3,6 +3,7 @@
 import * as React from "react";
 import { saveLinkToDB } from "@/lib/actions";
 import { useBookmarks } from "@/components/providers/bookmarks-provider";
+import { isUrl } from "@/lib/utils";
 
 export function SearchBar() {
   const searchInputRef = React.useRef<HTMLInputElement>(null);
@@ -80,10 +81,4 @@ export function SearchBar() {
       )}
     </div>
   );
-}
-
-function isUrl(url: string) {
-  const urlRegex = /^(https?:\/\/)|([\w-]+\.)+[\w-]+(\/.*)?$/i;
-  if (url.match(urlRegex)) return true;
-  return false;
 }
