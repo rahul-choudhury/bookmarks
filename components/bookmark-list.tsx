@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Input } from "@base-ui-components/react";
 import { useBookmarks } from "@/components/providers/bookmarks-provider";
 import { deleteBookmark, updateName } from "@/lib/actions";
 import { Bookmark } from "@/lib/db/bookmarks";
@@ -94,7 +93,7 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
       </div>
       <div className="flex-1 flex items-center gap-2 justify-between min-w-0">
         {isEditing ? (
-          <Input
+          <input
             autoFocus
             className="h-8 p-1 border w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 ring-offset-2"
             defaultValue={title || url}

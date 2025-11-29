@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Input } from "@base-ui-components/react";
 import { saveLinkToDB } from "@/lib/actions";
 import { useBookmarks } from "@/components/providers/bookmarks-provider";
 
@@ -67,7 +66,7 @@ export function SearchBar() {
 
   return (
     <div className="space-y-2 sticky top-6 md:top-8">
-      <Input
+      <input
         ref={searchInputRef}
         name="search"
         value={searchTerm}
