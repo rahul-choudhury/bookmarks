@@ -10,7 +10,7 @@ export function TitleBar() {
     <header className="flex items-center justify-between">
       <div className="flex items-center gap-2">
         <svg
-          className="w-5 h-5 text-gray-700"
+          className="h-5 w-5 text-gray-700"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -28,9 +28,9 @@ export function TitleBar() {
 
       <div className="space-x-2">
         <button
-          className={`w-20 px-3 py-1 text-sm border hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 ring-offset-2 transition-colors ${
+          className={`w-20 border px-3 py-1 text-sm ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none ${
             isManaging
-              ? "bg-blue-50 border-blue-300 text-blue-700"
+              ? "border-blue-300 bg-blue-50 text-blue-700"
               : "border-gray-300"
           }`}
           onClick={() => setIsManaging((prev) => !prev)}
@@ -38,7 +38,7 @@ export function TitleBar() {
           {isManaging ? "Done" : "Manage"}
         </button>
         <button
-          className="px-3 py-1 text-sm border hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 ring-offset-2 transition-colors border-gray-300"
+          className="border border-gray-300 px-3 py-1 text-sm ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none"
           onClick={() => {
             authClient.signOut();
             redirect("/login", RedirectType.replace);

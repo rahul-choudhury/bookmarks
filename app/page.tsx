@@ -22,7 +22,7 @@ export default async function Home() {
 
   return (
     <BookmarksProvider initialBookmarks={bookmarks}>
-      <div className="w-full max-w-4xl mx-auto p-6 md:p-8 space-y-4 relative">
+      <div className="relative mx-auto w-full max-w-4xl space-y-4 p-6 md:p-8">
         <TitleBar />
         <SearchBar />
         <BookmarkList />

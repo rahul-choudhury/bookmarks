@@ -17,11 +17,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-svh flex items-center justify-center bg-background">
+    <div className="flex min-h-svh items-center justify-center bg-background">
       <div className="flex flex-col gap-4">
         <button
           onClick={handleGithubLogin}
-          className="flex items-center gap-3 px-4 py-2 text-base border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 ring-offset-2 transition-colors"
+          className="flex items-center gap-3 border border-gray-300 px-4 py-2 text-base ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none"
         >
           <svg
             role="img"
@@ -38,7 +38,7 @@ export default function LoginPage() {
         </button>
         <button
           onClick={handleGoogleLogin}
-          className="flex items-center gap-3 px-4 py-2 text-base border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 ring-offset-2 transition-colors"
+          className="flex items-center gap-3 border border-gray-300 px-4 py-2 text-base ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none"
         >
           <svg
             role="img"

@@ -11,12 +11,12 @@ export function BookmarkList() {
 
   if (bookmarks.length === 0 && searchTerm.trim()) {
     return (
-      <div className="text-center py-8 text-gray-500 text-sm md:text-base">
+      <div className="py-8 text-center text-sm text-gray-500 md:text-base">
         <p>No results found for &quot;{searchTerm}&quot;</p>
         {isUrl(searchTerm) && (
-          <p className="text-sm mt-2">
+          <p className="mt-2 text-sm">
             Press{" "}
-            <kbd className="px-2 py-1 text-xs bg-gray-100 border border-gray-300 rounded">
+            <kbd className="rounded border border-gray-300 bg-gray-100 px-2 py-1 text-xs">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="14"
@@ -27,7 +27,7 @@ export function BookmarkList() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="inline-block mr-1"
+                className="mr-1 inline-block"
               >
                 <path d="M20 4v7a4 4 0 0 1-4 4H4" />
                 <path d="m9 10-5 5 5 5" />
@@ -60,7 +60,7 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
 
   return (
     <li
-      className="flex items-center gap-3 h-8"
+      className="flex h-8 items-center gap-3"
       style={{ opacity: isOptimistic ? 0.5 : 1 }}
     >
       <div className="size-4 shrink-0">
@@ -94,11 +94,11 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
           </svg>
         )}
       </div>
-      <div className="flex-1 flex items-center gap-2 justify-between min-w-0">
+      <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
         {isEditing ? (
           <input
             autoFocus
-            className="h-8 p-1 border w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 ring-offset-2"
+            className="h-8 w-full border border-gray-300 p-1 ring-offset-2 focus:ring-2 focus:ring-gray-500 focus:outline-none"
             defaultValue={title || url}
             onBlur={async (e) => {
               const newTitle = e.currentTarget.value;
@@ -126,23 +126,23 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
           <a
             href={url}
             target="_blank"
-            className="truncate max-w-[550px] hover:underline"
+            className="max-w-[550px] truncate hover:underline"
           >
             {title || url}
           </a>
         )}
-        <p className="text-xs text-gray-500 hidden md:block">
+        <p className="hidden text-xs text-gray-500 md:block">
           [{new URL(url).hostname}]
         </p>
       </div>
-      <p className="text-gray-500 shrink-0 hidden md:block">
+      <p className="hidden shrink-0 text-gray-500 md:block">
         {new Date(timeStamp).toLocaleDateString("en-IN")}
       </p>
 
       {isManaging && !isOptimistic && (
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex shrink-0 items-center gap-1">
           <button
-            className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors flex items-center justify-center h-7 w-7 border border-gray-200"
+            className="flex h-7 w-7 items-center justify-center border border-gray-200 p-1 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
             aria-label="Edit bookmark"
             onClick={() => setIsEditing((prev) => !prev)}
           >
@@ -162,7 +162,7 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
             </svg>
           </button>
           <button
-            className="p-1 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors flex items-center justify-center h-7 w-7 border border-gray-200"
+            className="flex h-7 w-7 items-center justify-center border border-gray-200 p-1 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600"
             aria-label="Delete bookmark"
             onClick={async () => {
               deleteOptimisticBookmark(id);
