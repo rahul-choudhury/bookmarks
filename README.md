@@ -2,6 +2,8 @@
 
 A minimalist bookmark manager built with **Next.js 16**, **React 19**, **Drizzle ORM**, and **Better Auth**.
 
+https://github.com/user-attachments/assets/ff8efd50-ed2c-4ae7-bee7-8a5d25d4e371
+
 ## Installation
 
 ```bash
