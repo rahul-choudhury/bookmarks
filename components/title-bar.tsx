@@ -26,9 +26,9 @@ export function TitleBar() {
         <h1 className="text-base font-medium text-gray-900">Bookmarks</h1>
       </div>
 
-      <div className="space-x-2">
+      <div className="flex gap-2">
         <button
-          className={`w-20 border px-3 py-1 text-sm ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none ${
+          className={`h-8 w-20 border px-3 py-1 text-sm ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none ${
             isManaging
               ? "border-blue-300 bg-blue-50 text-blue-700"
               : "border-gray-300"
@@ -38,7 +38,7 @@ export function TitleBar() {
           {isManaging ? "Done" : "Manage"}
         </button>
         <button
-          className="border border-gray-300 px-3 py-1 text-sm ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none"
+          className="h-8 border border-gray-300 px-3 py-1 text-sm ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none"
           onClick={() => {
             authClient.signOut();
             redirect("/login", RedirectType.replace);
