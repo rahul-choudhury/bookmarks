@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { useBookmarks } from "@/components/providers/bookmarks-provider";
 import { deleteBookmark, importBookmarks, updateName } from "@/lib/actions";
 import { Bookmark } from "@/lib/db/bookmarks";
@@ -60,6 +60,8 @@ function SearchResultPrompt({ searchTerm }: { searchTerm: string }) {
 
 function ImportBookmarks() {
   const [state, action, isPending] = useActionState(importBookmarks, null);
+  const ref = useRef<HTMLInputElement>(null);
+
   return (
     <div className="flex flex-col items-center justify-center space-y-6 py-12">
       <div className="text-center">
@@ -70,6 +72,7 @@ function ImportBookmarks() {
       </div>
       <button
         className="relative flex h-8 items-center gap-2 border border-gray-300 px-3 py-1 ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
+        onClick={() => ref.current?.click()}
         disabled={isPending}
       >
         <svg
@@ -90,17 +93,15 @@ function ImportBookmarks() {
           {isPending ? "Importing..." : "Import Bookmarks"}
         </span>
         <form action={action}>
-          <label htmlFor="json-file-input" className="absolute inset-0">
-            <input
-              id="json-file-input"
-              name="json"
-              type="file"
-              accept="application/JSON"
-              onChange={(e) => e.currentTarget.form?.requestSubmit()}
-              disabled={isPending}
-              hidden
-            />
-          </label>
+          <input
+            ref={ref}
+            name="json"
+            type="file"
+            accept="application/JSON"
+            onChange={(e) => e.currentTarget.form?.requestSubmit()}
+            disabled={isPending}
+            hidden
+          />
         </form>
       </button>
       {state && !state.success && state.message && (
