@@ -6,6 +6,103 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { bookmarksTable } from "@/lib/db/bookmarks";
 import { verifySession } from "./dal";
+import z from "zod";
+
+const bookmarkSchema = z.array(
+  z.object({
+    url: z.string(),
+    title: z.union([z.string(), z.null()]),
+    favicon: z.union([z.string(), z.null()]),
+    timeStamp: z.iso.datetime(),
+  }),
+);
+
+export async function importBookmarks(state: unknown, formData: FormData) {
+  const session = await verifySession();
+  if (!session) {
+    return {
+      success: false,
+      message: "Unauthorized.",
+    };
+  }
+
+  const json = formData.get("json");
+  if (!json || typeof json === "string" || json.type !== "application/json") {
+    return {
+      success: false,
+      message: "Invalid/No file found.",
+    };
+  }
+
+  const text = await json.text();
+
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    return {
+      success: false,
+      message: "Invalid/No file found.",
+    };
+  }
+
+  const validatedData = bookmarkSchema.safeParse(data);
+  if (!validatedData.success) {
+    return {
+      success: false,
+      message: "Invalid/No file found.",
+    };
+  }
+
+  let existing;
+  try {
+    existing = await db
+      .select({ url: bookmarksTable.url })
+      .from(bookmarksTable)
+      .where(eq(bookmarksTable.userId, session.userId));
+  } catch {
+    return {
+      success: false,
+      message: "Error querying the database. Try again later.",
+    };
+  }
+
+  const existingUrls = existing.map((e) => e.url);
+  const newBookmarks = validatedData.data.filter(
+    (item) => !existingUrls.includes(item.url),
+  );
+
+  if (newBookmarks.length === 0) {
+    return {
+      success: true,
+      message: "Bookmarks imported successfully.",
+    };
+  }
+
+  try {
+    await db.insert(bookmarksTable).values(
+      newBookmarks.map(({ url, title, favicon, timeStamp }) => ({
+        url,
+        title,
+        favicon,
+        timeStamp: new Date(timeStamp),
+        userId: session.userId,
+      })),
+    );
+  } catch {
+    return {
+      success: false,
+      message: "Failed to record data into the database. Try again later.",
+    };
+  }
+
+  revalidatePath("/");
+
+  return {
+    success: true,
+    message: "Bookmarks imported successfully.",
+  };
+}
 
 export async function saveLinkToDB(state: unknown, url: string) {
   const session = await verifySession();
@@ -15,15 +112,24 @@ export async function saveLinkToDB(state: unknown, url: string) {
     url = "https://" + url;
   }
 
-  const existing = await db
-    .select({ id: bookmarksTable.id })
-    .from(bookmarksTable)
-    .where(
-      and(
-        eq(bookmarksTable.url, url),
-        eq(bookmarksTable.userId, session.userId),
-      ),
-    );
+  let existing;
+
+  try {
+    existing = await db
+      .select({ id: bookmarksTable.id })
+      .from(bookmarksTable)
+      .where(
+        and(
+          eq(bookmarksTable.url, url),
+          eq(bookmarksTable.userId, session.userId),
+        ),
+      );
+  } catch {
+    return {
+      success: false,
+      message: "Failed to query database. Try again later.",
+    };
+  }
 
   if (existing.length > 0) {
     return {
@@ -140,3 +246,4 @@ export async function updateName(id: string, title: string) {
     message: "Bookmark title updated successfully.",
   };
 }
+

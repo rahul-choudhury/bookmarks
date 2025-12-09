@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import { useBookmarks } from "@/components/providers/bookmarks-provider";
-import { deleteBookmark, updateName } from "@/lib/actions";
+import { deleteBookmark, importBookmarks, updateName } from "@/lib/actions";
 import { Bookmark } from "@/lib/db/bookmarks";
 import { isUrl } from "@/lib/utils";
 
@@ -10,35 +10,11 @@ export function BookmarkList() {
   const { bookmarks, searchTerm } = useBookmarks();
 
   if (bookmarks.length === 0 && searchTerm.trim()) {
-    return (
-      <div className="py-8 text-center text-sm text-gray-500 md:text-base">
-        <p>No results found for &quot;{searchTerm}&quot;</p>
-        {isUrl(searchTerm) && (
-          <p className="mt-2 text-sm">
-            Press{" "}
-            <kbd className="rounded border border-gray-300 bg-gray-100 px-2 py-1 text-xs">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="mr-1 inline-block"
-              >
-                <path d="M20 4v7a4 4 0 0 1-4 4H4" />
-                <path d="m9 10-5 5 5 5" />
-              </svg>
-              Enter
-            </kbd>{" "}
-            to add this link to your bookmarks
-          </p>
-        )}
-      </div>
-    );
+    return <SearchResultPrompt searchTerm={searchTerm} />;
+  }
+
+  if (bookmarks.length === 0) {
+    return <ImportBookmarks />;
   }
 
   return (
@@ -47,6 +23,90 @@ export function BookmarkList() {
         <BookmarkItem key={bookmark.id} bookmark={bookmark} />
       ))}
     </ul>
+  );
+}
+
+function SearchResultPrompt({ searchTerm }: { searchTerm: string }) {
+  return (
+    <div className="py-8 text-center text-sm text-gray-500 md:text-base">
+      <p>No results found for &quot;{searchTerm}&quot;</p>
+      {isUrl(searchTerm) && (
+        <p className="mt-2 text-sm">
+          Press{" "}
+          <kbd className="rounded border border-gray-300 bg-gray-100 px-2 py-1 text-xs">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="mr-1 inline-block"
+            >
+              <path d="M20 4v7a4 4 0 0 1-4 4H4" />
+              <path d="m9 10-5 5 5 5" />
+            </svg>
+            Enter
+          </kbd>{" "}
+          to add this link to your bookmarks
+        </p>
+      )}
+    </div>
+  );
+}
+
+function ImportBookmarks() {
+  const [state, action, isPending] = useActionState(importBookmarks, null);
+  return (
+    <div className="flex flex-col items-center justify-center space-y-6 py-12">
+      <div className="text-center">
+        <p className="text-base font-medium text-gray-900">No bookmarks yet</p>
+        <p className="mt-1 text-sm text-gray-500">
+          Do you want to import any previously exported bookmarks?
+        </p>
+      </div>
+      <button
+        className="relative flex h-8 items-center gap-2 border border-gray-300 px-3 py-1 ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
+        disabled={isPending}
+      >
+        <svg
+          className={`h-4 w-4 text-gray-700 ${isPending ? "animate-spin" : ""}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
+        <span className="text-sm">
+          {isPending ? "Importing..." : "Import Bookmarks"}
+        </span>
+        <form action={action}>
+          <label htmlFor="json-file-input" className="absolute inset-0">
+            <input
+              id="json-file-input"
+              name="json"
+              type="file"
+              accept="application/JSON"
+              onChange={(e) => e.currentTarget.form?.requestSubmit()}
+              disabled={isPending}
+              hidden
+            />
+          </label>
+        </form>
+      </button>
+      {state && !state.success && state.message && (
+        <p className="text-sm text-red-500">{state.message}</p>
+      )}
+    </div>
   );
 }
 

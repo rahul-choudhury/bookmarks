@@ -22,7 +22,8 @@
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "server-only": "^0.0.1",
-    "unfurl.js": "^6.4.0"
+    "unfurl.js": "^6.4.0",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.17",

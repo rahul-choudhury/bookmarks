@@ -9,7 +9,7 @@ export function TitleBar() {
 
   const exportBookmarks = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const sanitizedBookmarks = bookmarks.map(({ userId, ...rest }) => rest);
+    const sanitizedBookmarks = bookmarks.map(({ id, userId, ...rest }) => rest);
     const jsonString = JSON.stringify(sanitizedBookmarks, null, 2);
     const jsonBlob = new Blob([jsonString], { type: "application/json" });
 
@@ -19,6 +19,7 @@ export function TitleBar() {
     a.download = `bookmarks-${new Date().toISOString()}.json`;
     document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
 
@@ -44,19 +45,21 @@ export function TitleBar() {
 
       <div className="flex gap-2">
         <button
-          className={`h-8 w-20 border px-3 py-1 text-sm ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none ${
+          className={`h-8 w-20 border px-3 py-1 text-sm ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white ${
             isManaging
               ? "border-blue-300 bg-blue-50 text-blue-700"
               : "border-gray-300"
           }`}
           onClick={() => setIsManaging((prev) => !prev)}
+          disabled={bookmarks.length === 0 && !isManaging}
         >
           {isManaging ? "Done" : "Manage"}
         </button>
         <button
-          className="flex h-8 w-8 items-center justify-center border border-gray-300 ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none"
+          className="flex h-8 w-8 items-center justify-center border border-gray-300 ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
           aria-label="Download"
           onClick={exportBookmarks}
+          disabled={bookmarks.length === 0}
         >
           <svg
             className="h-4 w-4 text-gray-700"
@@ -100,4 +103,3 @@ export function TitleBar() {
     </header>
   );
 }
-
