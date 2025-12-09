@@ -9,6 +9,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://bookmarks.rchoudhury.dev"),
   title: "Bookmarks",
   description: "<kbd> focused bookmark manager",
 };
