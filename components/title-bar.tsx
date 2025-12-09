@@ -5,7 +5,23 @@ import { useBookmarks } from "./providers/bookmarks-provider";
 import { redirect, RedirectType } from "next/navigation";
 
 export function TitleBar() {
-  const { isManaging, setIsManaging } = useBookmarks();
+  const { isManaging, bookmarks, setIsManaging } = useBookmarks();
+
+  const exportBookmarks = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const sanitizedBookmarks = bookmarks.map(({ userId, ...rest }) => rest);
+    const jsonString = JSON.stringify(sanitizedBookmarks, null, 2);
+    const jsonBlob = new Blob([jsonString], { type: "application/json" });
+
+    const url = URL.createObjectURL(jsonBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `bookmarks-${new Date().toISOString()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <header className="flex items-center justify-between">
       <div className="flex items-center gap-2">
@@ -38,15 +54,50 @@ export function TitleBar() {
           {isManaging ? "Done" : "Manage"}
         </button>
         <button
-          className="h-8 border border-gray-300 px-3 py-1 text-sm ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none"
+          className="flex h-8 w-8 items-center justify-center border border-gray-300 ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none"
+          aria-label="Download"
+          onClick={exportBookmarks}
+        >
+          <svg
+            className="h-4 w-4 text-gray-700"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+            />
+          </svg>
+        </button>
+        <button
+          className="flex h-8 w-8 items-center justify-center border border-gray-300 ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none"
+          aria-label="Sign out"
           onClick={() => {
             authClient.signOut();
             redirect("/login", RedirectType.replace);
           }}
         >
-          Sign Out
+          <svg
+            className="h-4 w-4 text-gray-700"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+            />
+          </svg>
         </button>
       </div>
     </header>
   );
 }
+
