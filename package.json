@@ -16,26 +16,26 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
-    "better-auth": "^1.4.5",
+    "better-auth": "^1.4.6",
     "drizzle-orm": "^0.44.7",
-    "next": "16.0.7",
-    "react": "^19.2.1",
-    "react-dom": "^19.2.1",
+    "next": "^16.0.10",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "server-only": "^0.0.1",
     "unfurl.js": "^6.4.0",
     "zod": "^4.1.13"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.17",
-    "@types/node": "^24.10.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/node": "^24.10.3",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "drizzle-kit": "^0.31.8",
     "eslint": "^9.39.1",
-    "eslint-config-next": "^16.0.7",
+    "eslint-config-next": "^16.0.10",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "tailwindcss": "^4.1.17",
+    "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3"
   }
 }
