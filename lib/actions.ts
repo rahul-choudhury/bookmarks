@@ -138,25 +138,26 @@ export async function saveLinkToDB(state: unknown, url: string) {
     };
   }
 
-  let result;
+  let title = null;
+  let favicon = null;
 
   try {
-    result = await unfurl(url);
+    const result = await unfurl(url);
+    title = result.title ?? null;
+    favicon = result.favicon ?? null;
   } catch {
-    return {
-      success: false,
-      message:
-        "Failed to obtain link information. Make sure the link is publicly accessible.",
-    };
+    // NOTE: this is intentional as i can't get status codes out of
+    // unfurl. hence rate limited requests (429) result in a failed
+    // unfurl query (for example sites protected by vercel bot protection).
+    // so no title and favicons. this try block helps safely set these values to null.
+    // maybe i will revisit this later.
   }
-
-  const { title, favicon } = result;
 
   try {
     await db.insert(bookmarksTable).values({
       url,
-      title: title || null,
-      favicon: favicon || null,
+      title: title ?? null,
+      favicon: favicon ?? null,
       userId: session.userId,
     });
   } catch {
@@ -246,4 +247,3 @@ export async function updateName(id: string, title: string) {
     message: "Bookmark title updated successfully.",
   };
 }
-
