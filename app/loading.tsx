@@ -84,7 +84,12 @@ function TitleBarPlaceholder() {
 function SearchBarPlaceholder() {
   return (
     <div className="sticky top-6 space-y-2 md:top-8">
-      <div className="h-10 w-full animate-pulse border border-gray-300 bg-gray-100" />
+      <input
+        name="search"
+        placeholder="Search or paste URL (Press '/' to focus)"
+        className="h-10 w-full border border-gray-300 bg-white px-4 py-2 text-base ring-offset-2 focus:ring-2 focus:ring-gray-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+        disabled
+      />
     </div>
   );
 }
