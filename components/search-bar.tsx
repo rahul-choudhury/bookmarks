@@ -74,7 +74,7 @@ export function SearchBar() {
         onChange={(e) => setSearchTerm(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Search or paste URL (Press '/' to focus)"
-        className="w-full border border-gray-300 bg-white px-4 py-2 text-base ring-offset-2 focus:ring-2 focus:ring-gray-500 focus:outline-none"
+        className="h-10 w-full border border-gray-300 bg-white px-4 py-2 text-base ring-offset-2 focus:ring-2 focus:ring-gray-500 focus:outline-none"
       />
       {state && !state.success && state.message && (
         <p className="text-sm text-red-500">{state.message}</p>
