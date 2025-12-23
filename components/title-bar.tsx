@@ -24,7 +24,7 @@ export function TitleBar() {
   };
 
   return (
-    <header className="flex items-center justify-between">
+    <header className="flex items-center justify-between pt-6">
       <div className="flex items-center gap-2">
         <svg
           className="h-5 w-5 text-gray-700"

@@ -22,9 +22,11 @@ export default async function Home() {
 
   return (
     <BookmarksProvider initialBookmarks={bookmarks}>
-      <div className="relative mx-auto w-full max-w-4xl space-y-4 p-6 md:p-8">
-        <TitleBar />
-        <SearchBar />
+      <div className="grid grid-cols-[1fr_minmax(auto,800px)_1fr] gap-x-6 gap-y-4 pb-6 *:col-start-2 *:min-w-0">
+        <div className="sticky top-0 space-y-4 bg-white/95">
+          <TitleBar />
+          <SearchBar />
+        </div>
         <BookmarkList />
       </div>
     </BookmarksProvider>

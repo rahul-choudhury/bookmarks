@@ -66,7 +66,7 @@ export function SearchBar() {
   }, []);
 
   return (
-    <div className="sticky top-6 space-y-2 md:top-8">
+    <div className="space-y-2">
       <input
         ref={searchInputRef}
         name="search"
@@ -74,7 +74,7 @@ export function SearchBar() {
         onChange={(e) => setSearchTerm(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Search or paste URL (Press '/' to focus)"
-        className="h-10 w-full border border-gray-300 bg-white px-4 py-2 text-base ring-offset-2 focus:ring-2 focus:ring-gray-500 focus:outline-none"
+        className="h-10 w-full border border-gray-300 px-4 py-2 text-base ring-offset-2 focus:ring-2 focus:ring-gray-500 focus:outline-none"
       />
       {state && !state.success && state.message && (
         <p className="text-sm text-red-500">{state.message}</p>
