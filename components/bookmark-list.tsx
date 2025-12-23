@@ -187,7 +187,7 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
           <a
             href={url}
             target="_blank"
-            className="max-w-[550px] truncate hover:underline"
+            className="max-w-137.5 truncate hover:underline"
           >
             {title || url}
           </a>
