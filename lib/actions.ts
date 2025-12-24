@@ -27,7 +27,11 @@ export async function importBookmarks(state: unknown, formData: FormData) {
   }
 
   const json = formData.get("json");
-  if (!json || typeof json === "string" || json.type !== "application/json") {
+  if (
+    !json ||
+    typeof json === "string" ||
+    !json.type?.startsWith("application/json")
+  ) {
     return {
       success: false,
       message: "Invalid/No file found.",
