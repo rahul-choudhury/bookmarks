@@ -42,7 +42,7 @@ export function BookmarksProvider({
 
     const interval = setInterval(() => {
       router.refresh();
-    }, 3000);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [hasPendingMetadata, router]);
