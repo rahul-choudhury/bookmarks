@@ -58,54 +58,30 @@ export async function importBookmarks(state: unknown, formData: FormData) {
     };
   }
 
-  let existing;
   try {
-    existing = await db
-      .select({ url: bookmarksTable.url })
-      .from(bookmarksTable)
-      .where(eq(bookmarksTable.userId, session.userId));
-  } catch {
-    return {
-      success: false,
-      message: "Error querying the database. Try again later.",
-    };
-  }
+    await db
+      .insert(bookmarksTable)
+      .values(
+        validatedData.data.map((item) => ({
+          ...item,
+          timeStamp: new Date(item.timeStamp),
+          userId: session.userId,
+        })),
+      )
+      .onConflictDoNothing();
 
-  const existingUrls = existing.map((e) => e.url);
-  const newBookmarks = validatedData.data.filter(
-    (item) => !existingUrls.includes(item.url),
-  );
+    revalidatePath("/");
 
-  if (newBookmarks.length === 0) {
     return {
       success: true,
       message: "Bookmarks imported successfully.",
     };
-  }
-
-  try {
-    await db.insert(bookmarksTable).values(
-      newBookmarks.map(({ url, title, favicon, timeStamp }) => ({
-        url,
-        title,
-        favicon,
-        timeStamp: new Date(timeStamp),
-        userId: session.userId,
-      })),
-    );
   } catch {
     return {
       success: false,
       message: "Failed to record data into the database. Try again later.",
     };
   }
-
-  revalidatePath("/");
-
-  return {
-    success: true,
-    message: "Bookmarks imported successfully.",
-  };
 }
 
 export async function saveLinkToDB(state: unknown, url: string) {
@@ -114,32 +90,6 @@ export async function saveLinkToDB(state: unknown, url: string) {
 
   if (!url.startsWith("http://") && !url.startsWith("https://")) {
     url = "https://" + url;
-  }
-
-  let existing;
-
-  try {
-    existing = await db
-      .select({ id: bookmarksTable.id })
-      .from(bookmarksTable)
-      .where(
-        and(
-          eq(bookmarksTable.url, url),
-          eq(bookmarksTable.userId, session.userId),
-        ),
-      );
-  } catch {
-    return {
-      success: false,
-      message: "Failed to query database. Try again later.",
-    };
-  }
-
-  if (existing.length > 0) {
-    return {
-      success: false,
-      message: "Bookmark already exists.",
-    };
   }
 
   let title = null;
@@ -158,25 +108,28 @@ export async function saveLinkToDB(state: unknown, url: string) {
   }
 
   try {
-    await db.insert(bookmarksTable).values({
-      url,
-      title: title ?? null,
-      favicon: favicon ?? null,
-      userId: session.userId,
-    });
+    await db
+      .insert(bookmarksTable)
+      .values({
+        url,
+        title: title ?? null,
+        favicon: favicon ?? null,
+        userId: session.userId,
+      })
+      .onConflictDoNothing();
+
+    revalidatePath("/");
+
+    return {
+      success: true,
+      message: "Bookmark saved.",
+    };
   } catch {
     return {
       success: false,
-      message: "Failed to record data into the database. Try again later.",
+      message: "Bookmark already exists.",
     };
   }
-
-  revalidatePath("/");
-
-  return {
-    success: true,
-    message: "Bookmark saved.",
-  };
 }
 
 export async function deleteBookmark(id: string) {
