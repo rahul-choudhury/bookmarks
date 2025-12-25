@@ -1,6 +1,5 @@
 "use server";
 
-import { unfurl } from "unfurl.js";
 import { revalidatePath } from "next/cache";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
