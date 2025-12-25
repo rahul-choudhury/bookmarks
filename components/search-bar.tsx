@@ -3,7 +3,7 @@
 import * as React from "react";
 import { saveLinkToDB } from "@/lib/actions";
 import { useBookmarks } from "@/components/providers/bookmarks-provider";
-import { isUrl } from "@/lib/utils";
+import { isUrl, transformUrl } from "@/lib/utils";
 
 export function SearchBar() {
   const searchInputRef = React.useRef<HTMLInputElement>(null);
@@ -32,13 +32,12 @@ export function SearchBar() {
 
       setSearchTerm("");
 
+      const transformedUrl = transformUrl(searchTerm);
       addOptimisticBookmark({
         id: crypto.randomUUID(),
         userId: "temp", // TODO: should i leave temp or add the actual id from session?
-        url: searchTerm.startsWith("http")
-          ? searchTerm
-          : `https://${searchTerm}`,
-        title: searchTerm,
+        url: transformedUrl,
+        title: transformedUrl,
         favicon: null,
         timeStamp: new Date(),
       });

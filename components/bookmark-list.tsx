@@ -116,14 +116,10 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
     useBookmarks();
   const { id, url, title, favicon, timeStamp } = bookmark;
 
-  const isOptimistic = "optimistic" in bookmark;
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <li
-      className="flex h-8 items-center gap-3"
-      style={{ opacity: isOptimistic ? 0.5 : 1 }}
-    >
+    <li className="flex h-8 items-center gap-3">
       <div className="size-4 shrink-0">
         {favicon ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -200,7 +196,7 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
         {new Date(timeStamp).toLocaleDateString("en-IN")}
       </p>
 
-      {isManaging && !isOptimistic && (
+      {isManaging && (
         <div className="flex shrink-0 items-center gap-1">
           <button
             className="flex h-7 w-7 items-center justify-center border border-gray-200 p-1 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"

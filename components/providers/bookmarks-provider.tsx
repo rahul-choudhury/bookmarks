@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import type { Bookmark } from "@/lib/db/bookmarks";
+import { transformUrl } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 type BookmarksContextType = {
   bookmarks: Bookmark[];
@@ -29,12 +31,28 @@ export function BookmarksProvider({
   children: React.ReactNode;
   initialBookmarks: Bookmark[];
 }) {
+  const router = useRouter();
+
+  const hasPendingMetadata = React.useMemo(() => {
+    return initialBookmarks.some((b) => !b.title);
+  }, [initialBookmarks]);
+
+  React.useEffect(() => {
+    if (!hasPendingMetadata) return;
+
+    const interval = setInterval(() => {
+      router.refresh();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [hasPendingMetadata, router]);
+
   const [optimisticBookmarks, dispatchOptimistic] = React.useOptimistic(
     initialBookmarks,
     (state, action: Action) => {
       switch (action.type) {
         case "ADD":
-          return [{ ...action.bookmark, optimistic: true }, ...state];
+          return [action.bookmark, ...state];
         case "UPDATE":
           return state.map((item) =>
             item.id === action.id ? { ...item, title: action.title } : item,

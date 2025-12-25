@@ -7,6 +7,8 @@ import { db } from "@/lib/db";
 import { bookmarksTable } from "@/lib/db/bookmarks";
 import { verifySession } from "./dal";
 import z from "zod";
+import { queue } from "./meta-queue";
+import { transformUrl } from "./utils";
 
 const bookmarkSchema = z.array(
   z.object({
@@ -88,37 +90,21 @@ export async function saveLinkToDB(state: unknown, url: string) {
   const session = await verifySession();
   if (!session) return null;
 
-  if (!url.startsWith("http://") && !url.startsWith("https://")) {
-    url = "https://" + url;
-  }
-
-  let title = null;
-  let favicon = null;
-
-  try {
-    const result = await unfurl(url);
-    title = result.title ?? null;
-    favicon = result.favicon ?? null;
-  } catch {
-    // NOTE: this is intentional as i can't get status codes out of
-    // unfurl. hence rate limited requests (429) result in a failed
-    // unfurl query (for example sites protected by vercel bot protection).
-    // so no title and favicons. this try block helps safely set these values to null.
-    // maybe i will revisit this later.
-  }
+  url = transformUrl(url);
 
   try {
     await db
       .insert(bookmarksTable)
       .values({
         url,
-        title: title ?? null,
-        favicon: favicon ?? null,
+        title: null,
+        favicon: null,
         userId: session.userId,
       })
       .onConflictDoNothing();
 
     revalidatePath("/");
+    queue.add(url, session.userId);
 
     return {
       success: true,
