@@ -3,6 +3,7 @@
 import { authClient } from "@/lib/auth-client";
 import { useBookmarks } from "./providers/bookmarks-provider";
 import { redirect, RedirectType } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export function TitleBar() {
   const { isManaging, bookmarks, setIsManaging } = useBookmarks();
@@ -45,11 +46,10 @@ export function TitleBar() {
 
       <div className="flex gap-2">
         <button
-          className={`h-8 w-20 border px-3 py-1 text-sm ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white ${
-            isManaging
-              ? "border-blue-300 bg-blue-50 text-blue-700"
-              : "border-gray-300"
-          }`}
+          className={cn(
+            "h-8 w-20 border border-gray-300 px-3 py-1 text-sm ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white",
+            isManaging && "border-blue-300 bg-blue-50 text-blue-700",
+          )}
           onClick={() => setIsManaging((prev) => !prev)}
           disabled={bookmarks.length === 0 && !isManaging}
         >

@@ -18,12 +18,15 @@
   },
   "dependencies": {
     "better-auth": "^1.4.9",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "drizzle-orm": "^0.44.7",
     "next": "^16.1.1",
     "pg": "^8.16.3",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "server-only": "^0.0.1",
+    "tailwind-merge": "^3.4.0",
     "unfurl.js": "^6.4.0",
     "zod": "^4.2.1"
   },

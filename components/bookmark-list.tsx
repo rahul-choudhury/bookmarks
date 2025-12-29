@@ -4,7 +4,7 @@ import { useActionState, useRef, useState } from "react";
 import { useBookmarks } from "@/components/providers/bookmarks-provider";
 import { deleteBookmark, importBookmarks, updateName } from "@/lib/actions";
 import { Bookmark } from "@/lib/db/bookmarks";
-import { isUrl } from "@/lib/utils";
+import { cn, isUrl } from "@/lib/utils";
 
 export function BookmarkList() {
   const { bookmarks, searchTerm } = useBookmarks();
@@ -76,7 +76,7 @@ function ImportBookmarks() {
         disabled={isPending}
       >
         <svg
-          className={`h-4 w-4 text-gray-700 ${isPending ? "animate-spin" : ""}`}
+          className={cn("h-4 w-4 text-gray-700", isPending && "animate-spin")}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
