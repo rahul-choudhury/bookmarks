@@ -4,6 +4,7 @@ import * as React from "react";
 import { saveLinkToDB } from "@/lib/actions";
 import { useBookmarks } from "@/components/providers/bookmarks-provider";
 import { isUrl, transformUrl } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
 export function SearchBar() {
   const searchInputRef = React.useRef<HTMLInputElement>(null);
@@ -66,14 +67,14 @@ export function SearchBar() {
 
   return (
     <div className="space-y-2">
-      <input
+      <Input
         ref={searchInputRef}
         name="search"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Search or paste URL (Press '/' to focus)"
-        className="h-10 w-full border border-gray-300 px-4 py-2 text-base ring-offset-2 focus:ring-2 focus:ring-gray-500 focus:outline-none"
+        className="h-10 w-full px-4 py-2 text-base"
       />
       {state && !state.success && state.message && (
         <p className="text-sm text-red-500">{state.message}</p>

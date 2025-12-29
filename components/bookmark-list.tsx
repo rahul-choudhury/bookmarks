@@ -6,6 +6,7 @@ import { deleteBookmark, importBookmarks, updateName } from "@/lib/actions";
 import { Bookmark } from "@/lib/db/bookmarks";
 import { cn, isUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export function BookmarkList() {
   const { bookmarks, searchTerm } = useBookmarks();
@@ -155,9 +156,9 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
       </div>
       <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
         {isEditing ? (
-          <input
+          <Input
             autoFocus
-            className="h-8 w-full border border-gray-300 p-1 ring-offset-2 focus:ring-2 focus:ring-gray-500 focus:outline-none"
+            className="h-8 w-full px-3 py-1.5 text-sm"
             defaultValue={title || url}
             onBlur={async (e) => {
               const newTitle = e.currentTarget.value;
