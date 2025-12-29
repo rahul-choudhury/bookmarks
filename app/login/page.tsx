@@ -1,6 +1,7 @@
 "use client";
 
 import { authClient } from "@/lib/auth-client";
+import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
   const handleGithubLogin = async () => {
@@ -19,10 +20,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-svh items-center justify-center bg-background">
       <div className="flex flex-col gap-4">
-        <button
-          onClick={handleGithubLogin}
-          className="flex items-center gap-3 border border-gray-300 px-4 py-2 text-base ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none"
-        >
+        <Button onClick={handleGithubLogin}>
           <svg
             role="img"
             xmlns="http://www.w3.org/2000/svg"
@@ -35,11 +33,8 @@ export default function LoginPage() {
             ></path>
           </svg>
           <span className="font-medium">Continue with Github</span>
-        </button>
-        <button
-          onClick={handleGoogleLogin}
-          className="flex items-center gap-3 border border-gray-300 px-4 py-2 text-base ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none"
-        >
+        </Button>
+        <Button onClick={handleGoogleLogin}>
           <svg
             role="img"
             xmlns="http://www.w3.org/2000/svg"
@@ -64,7 +59,7 @@ export default function LoginPage() {
             ></path>
           </svg>
           <span className="font-medium">Continue with Google</span>
-        </button>
+        </Button>
       </div>
     </div>
   );

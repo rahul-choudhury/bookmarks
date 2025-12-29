@@ -4,6 +4,7 @@ import { authClient } from "@/lib/auth-client";
 import { useBookmarks } from "./providers/bookmarks-provider";
 import { redirect, RedirectType } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export function TitleBar() {
   const { isManaging, bookmarks, setIsManaging } = useBookmarks();
@@ -45,18 +46,20 @@ export function TitleBar() {
       </div>
 
       <div className="flex gap-2">
-        <button
+        <Button
           className={cn(
-            "h-8 w-20 border border-gray-300 px-3 py-1 text-sm ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white",
+            "w-20",
             isManaging && "border-blue-300 bg-blue-50 text-blue-700",
           )}
+          size="sm"
           onClick={() => setIsManaging((prev) => !prev)}
           disabled={bookmarks.length === 0 && !isManaging}
         >
           {isManaging ? "Done" : "Manage"}
-        </button>
-        <button
-          className="flex h-8 w-8 items-center justify-center border border-gray-300 ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
+        </Button>
+        <Button
+          variant="icon"
+          size="icon"
           aria-label="Download"
           onClick={exportBookmarks}
           disabled={bookmarks.length === 0}
@@ -75,9 +78,10 @@ export function TitleBar() {
               d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
             />
           </svg>
-        </button>
-        <button
-          className="flex h-8 w-8 items-center justify-center border border-gray-300 ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none"
+        </Button>
+        <Button
+          variant="icon"
+          size="icon"
           aria-label="Sign out"
           onClick={() => {
             authClient.signOut();
@@ -98,7 +102,7 @@ export function TitleBar() {
               d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
             />
           </svg>
-        </button>
+        </Button>
       </div>
     </header>
   );

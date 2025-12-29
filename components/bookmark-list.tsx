@@ -5,6 +5,7 @@ import { useBookmarks } from "@/components/providers/bookmarks-provider";
 import { deleteBookmark, importBookmarks, updateName } from "@/lib/actions";
 import { Bookmark } from "@/lib/db/bookmarks";
 import { cn, isUrl } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export function BookmarkList() {
   const { bookmarks, searchTerm } = useBookmarks();
@@ -70,8 +71,9 @@ function ImportBookmarks() {
           Do you want to import any previously exported bookmarks?
         </p>
       </div>
-      <button
-        className="relative flex h-8 items-center gap-2 border border-gray-300 px-3 py-1 ring-offset-2 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
+      <Button
+        className="relative gap-2"
+        size="sm"
         onClick={() => ref.current?.click()}
         disabled={isPending}
       >
@@ -103,7 +105,7 @@ function ImportBookmarks() {
             hidden
           />
         </form>
-      </button>
+      </Button>
       {state && !state.success && state.message && (
         <p className="text-sm text-red-500">{state.message}</p>
       )}
@@ -198,8 +200,10 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
 
       {isManaging && (
         <div className="flex shrink-0 items-center gap-1">
-          <button
-            className="flex h-7 w-7 items-center justify-center border border-gray-200 p-1 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+          <Button
+            variant="icon"
+            size="xs"
+            className="text-gray-500 hover:bg-gray-100 hover:text-gray-700"
             aria-label="Edit bookmark"
             onClick={() => setIsEditing((prev) => !prev)}
           >
@@ -217,9 +221,11 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
               <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
               <path d="m15 5 4 4" />
             </svg>
-          </button>
-          <button
-            className="flex h-7 w-7 items-center justify-center border border-gray-200 p-1 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600"
+          </Button>
+          <Button
+            size="xs"
+            variant="destructive"
+            className="text-gray-500"
             aria-label="Delete bookmark"
             onClick={async () => {
               deleteOptimisticBookmark(id);
@@ -241,7 +247,7 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
               <path d="M3 6h18" />
               <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
             </svg>
-          </button>
+          </Button>
         </div>
       )}
     </li>
