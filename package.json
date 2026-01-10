@@ -10,8 +10,8 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "db:up": "docker compose -f ./compose.development.yml up -d",
-    "db:down": "docker compose -f ./compose.development.yml down",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:migrate": "NODE_ENV=production && drizzle-kit migrate"
