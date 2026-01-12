@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useBookmarks } from "@/components/providers/bookmarks-provider";
 import { deleteBookmark, importBookmarks, updateName } from "@/lib/actions";
 import { Bookmark } from "@/lib/db/bookmarks";
@@ -9,7 +9,34 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export function BookmarkList() {
-  const { bookmarks, searchTerm } = useBookmarks();
+  const { bookmarks, searchTerm, isManaging, setIsManaging } = useBookmarks();
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isInputFocused =
+        target.tagName === "INPUT" || target.tagName === "TEXTAREA";
+
+      if (isInputFocused) return;
+
+      // 'm' to toggle management mode
+      if (e.key === "m" && bookmarks.length > 0) {
+        e.preventDefault();
+        setIsManaging((prev) => !prev);
+        return;
+      }
+
+      // Escape to exit management mode
+      if (e.key === "Escape" && isManaging) {
+        setIsManaging(false);
+        return;
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [bookmarks.length, isManaging, setIsManaging]);
 
   if (bookmarks.length === 0 && searchTerm.trim()) {
     return <SearchResultPrompt searchTerm={searchTerm} />;
@@ -173,6 +200,12 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
               await updateName(id, newTitle);
             }}
             onKeyDown={async (e) => {
+              if (e.key === "Escape") {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsEditing(false);
+                return;
+              }
               if (e.key === "Enter") {
                 e.preventDefault();
                 const newTitle = e.currentTarget.value;
