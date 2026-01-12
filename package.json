@@ -13,8 +13,8 @@
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "db:generate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push",
-    "db:migrate": "NODE_ENV=production && drizzle-kit migrate"
+    "db:push": "NODE_ENV=development drizzle-kit push",
+    "db:migrate": "NODE_ENV=production drizzle-kit migrate"
   },
   "dependencies": {
     "better-auth": "^1.4.9",
