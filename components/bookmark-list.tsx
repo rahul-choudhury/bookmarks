@@ -9,7 +9,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export function BookmarkList() {
-  const { bookmarks, searchTerm, isManaging, setIsManaging } = useBookmarks();
+  const {
+    bookmarks,
+    searchTerm,
+    isManaging,
+    selectedIndex,
+    setIsManaging,
+    setSelectedIndex,
+  } = useBookmarks();
+
+  const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -27,16 +36,62 @@ export function BookmarkList() {
         return;
       }
 
-      // Escape to exit management mode
-      if (e.key === "Escape" && isManaging) {
-        setIsManaging(false);
+      // Escape to exit management mode or clear selection
+      if (e.key === "Escape") {
+        if (isManaging) {
+          setIsManaging(false);
+        } else if (selectedIndex !== null) {
+          setSelectedIndex(null);
+        }
+        return;
+      }
+
+      // Navigation: j/k or arrow keys
+      if (
+        (e.key === "j" || e.key === "ArrowDown") &&
+        bookmarks.length > 0
+      ) {
+        e.preventDefault();
+        setSelectedIndex((prev) => {
+          if (prev === null) return 0;
+          return Math.min(prev + 1, bookmarks.length - 1);
+        });
+        return;
+      }
+
+      if (
+        (e.key === "k" || e.key === "ArrowUp") &&
+        bookmarks.length > 0
+      ) {
+        e.preventDefault();
+        setSelectedIndex((prev) => {
+          if (prev === null) return 0;
+          return Math.max(prev - 1, 0);
+        });
+        return;
+      }
+
+      // Enter to open selected bookmark
+      if (e.key === "Enter" && selectedIndex !== null && bookmarks[selectedIndex]) {
+        e.preventDefault();
+        window.open(bookmarks[selectedIndex].url, "_blank");
         return;
       }
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [bookmarks.length, isManaging, setIsManaging]);
+  }, [bookmarks, isManaging, selectedIndex, setIsManaging, setSelectedIndex]);
+
+  // Scroll selected item into view
+  useEffect(() => {
+    if (selectedIndex !== null && itemRefs.current[selectedIndex]) {
+      itemRefs.current[selectedIndex]?.scrollIntoView({
+        block: "center",
+        behavior: "smooth",
+      });
+    }
+  }, [selectedIndex]);
 
   if (bookmarks.length === 0 && searchTerm.trim()) {
     return <SearchResultPrompt searchTerm={searchTerm} />;
@@ -48,8 +103,15 @@ export function BookmarkList() {
 
   return (
     <ul className="space-y-2 text-sm">
-      {bookmarks.map((bookmark) => (
-        <BookmarkItem key={bookmark.id} bookmark={bookmark} />
+      {bookmarks.map((bookmark, index) => (
+        <BookmarkItem
+          key={bookmark.id}
+          bookmark={bookmark}
+          isSelected={index === selectedIndex}
+          ref={(el) => {
+            itemRefs.current[index] = el;
+          }}
+        />
       ))}
     </ul>
   );
@@ -141,7 +203,15 @@ function ImportBookmarks() {
   );
 }
 
-function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
+function BookmarkItem({
+  bookmark,
+  isSelected,
+  ref,
+}: {
+  bookmark: Bookmark;
+  isSelected: boolean;
+  ref: React.Ref<HTMLLIElement>;
+}) {
   const { isManaging, updateOptimisticBookmark, deleteOptimisticBookmark } =
     useBookmarks();
   const { id, url, title, favicon, timeStamp } = bookmark;
@@ -149,7 +219,13 @@ function BookmarkItem({ bookmark }: { bookmark: Bookmark }) {
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <li className="flex h-8 items-center gap-3">
+    <li
+      ref={ref}
+      className={cn(
+        "flex h-8 items-center gap-3 -mx-2 px-2 rounded",
+        isSelected && "bg-neutral-100"
+      )}
+    >
       <div className="size-4 shrink-0">
         {favicon ? (
           // eslint-disable-next-line @next/next/no-img-element

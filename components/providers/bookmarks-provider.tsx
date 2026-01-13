@@ -8,8 +8,10 @@ type BookmarksContextType = {
   bookmarks: Bookmark[];
   searchTerm: string;
   isManaging: boolean;
+  selectedIndex: number | null;
   setIsManaging: React.Dispatch<React.SetStateAction<boolean>>;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
   addOptimisticBookmark: (bookmark: Bookmark) => void;
   updateOptimisticBookmark: (id: string, title: string) => void;
   deleteOptimisticBookmark: (id: string) => void;
@@ -82,6 +84,7 @@ export function BookmarksProvider({
 
   const [isManaging, setIsManaging] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [selectedIndex, setSelectedIndex] = React.useState<number | null>(null);
 
   const bookmarks = React.useMemo(() => {
     if (!searchTerm.trim()) {
@@ -101,14 +104,28 @@ export function BookmarksProvider({
     });
   }, [searchTerm, optimisticBookmarks]);
 
+  // Reset selection when search term changes
+  React.useEffect(() => {
+    setSelectedIndex(null);
+  }, [searchTerm]);
+
+  // Clamp selectedIndex when bookmarks length changes
+  React.useEffect(() => {
+    if (selectedIndex !== null && selectedIndex >= bookmarks.length) {
+      setSelectedIndex(bookmarks.length > 0 ? bookmarks.length - 1 : null);
+    }
+  }, [bookmarks.length, selectedIndex]);
+
   return (
     <BookmarksContext
       value={{
         bookmarks,
         searchTerm,
         isManaging,
+        selectedIndex,
         setIsManaging,
         setSearchTerm,
+        setSelectedIndex,
         addOptimisticBookmark,
         updateOptimisticBookmark,
         deleteOptimisticBookmark,
