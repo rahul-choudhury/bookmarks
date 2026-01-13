@@ -9,9 +9,11 @@ type BookmarksContextType = {
   searchTerm: string;
   isManaging: boolean;
   selectedIndex: number | null;
+  editingId: string | null;
   setIsManaging: React.Dispatch<React.SetStateAction<boolean>>;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
+  setEditingId: React.Dispatch<React.SetStateAction<string | null>>;
   addOptimisticBookmark: (bookmark: Bookmark) => void;
   updateOptimisticBookmark: (id: string, title: string) => void;
   deleteOptimisticBookmark: (id: string) => void;
@@ -85,6 +87,7 @@ export function BookmarksProvider({
   const [isManaging, setIsManaging] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [selectedIndex, setSelectedIndex] = React.useState<number | null>(null);
+  const [editingId, setEditingId] = React.useState<string | null>(null);
 
   const bookmarks = React.useMemo(() => {
     if (!searchTerm.trim()) {
@@ -109,6 +112,13 @@ export function BookmarksProvider({
     setSelectedIndex(null);
   }, [searchTerm]);
 
+  // Clear editing state when exiting manage mode
+  React.useEffect(() => {
+    if (!isManaging) {
+      setEditingId(null);
+    }
+  }, [isManaging]);
+
   // Clamp selectedIndex when bookmarks length changes
   React.useEffect(() => {
     if (selectedIndex !== null && selectedIndex >= bookmarks.length) {
@@ -123,9 +133,11 @@ export function BookmarksProvider({
         searchTerm,
         isManaging,
         selectedIndex,
+        editingId,
         setIsManaging,
         setSearchTerm,
         setSelectedIndex,
+        setEditingId,
         addOptimisticBookmark,
         updateOptimisticBookmark,
         deleteOptimisticBookmark,

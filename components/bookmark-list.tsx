@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { useBookmarks } from "@/components/providers/bookmarks-provider";
 import { deleteBookmark, importBookmarks, updateName } from "@/lib/actions";
 import { Bookmark } from "@/lib/db/bookmarks";
@@ -16,6 +16,8 @@ export function BookmarkList() {
     selectedIndex,
     setIsManaging,
     setSelectedIndex,
+    setEditingId,
+    deleteOptimisticBookmark,
   } = useBookmarks();
 
   const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
@@ -77,11 +79,37 @@ export function BookmarkList() {
         window.open(bookmarks[selectedIndex].url, "_blank");
         return;
       }
+
+      // Edit selected bookmark (e or Shift+R) - only in manage mode
+      if (
+        (e.key === "e" || (e.key === "R" && e.shiftKey)) &&
+        isManaging &&
+        selectedIndex !== null &&
+        bookmarks[selectedIndex]
+      ) {
+        e.preventDefault();
+        setEditingId(bookmarks[selectedIndex].id);
+        return;
+      }
+
+      // Delete selected bookmark (d or Shift+D) - only in manage mode
+      if (
+        (e.key === "d" || (e.key === "D" && e.shiftKey)) &&
+        isManaging &&
+        selectedIndex !== null &&
+        bookmarks[selectedIndex]
+      ) {
+        e.preventDefault();
+        const bookmarkToDelete = bookmarks[selectedIndex];
+        deleteOptimisticBookmark(bookmarkToDelete.id);
+        deleteBookmark(bookmarkToDelete.id);
+        return;
+      }
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [bookmarks, isManaging, selectedIndex, setIsManaging, setSelectedIndex]);
+  }, [bookmarks, isManaging, selectedIndex, setIsManaging, setSelectedIndex, setEditingId, deleteOptimisticBookmark]);
 
   // Scroll selected item into view
   useEffect(() => {
@@ -212,11 +240,16 @@ function BookmarkItem({
   isSelected: boolean;
   ref: React.Ref<HTMLLIElement>;
 }) {
-  const { isManaging, updateOptimisticBookmark, deleteOptimisticBookmark } =
-    useBookmarks();
+  const {
+    isManaging,
+    editingId,
+    setEditingId,
+    updateOptimisticBookmark,
+    deleteOptimisticBookmark,
+  } = useBookmarks();
   const { id, url, title, favicon, timeStamp } = bookmark;
 
-  const [isEditing, setIsEditing] = useState(false);
+  const isEditing = editingId === id;
 
   return (
     <li
@@ -267,26 +300,26 @@ function BookmarkItem({
               const newTitle = e.currentTarget.value;
 
               if (newTitle === bookmark.title) {
-                setIsEditing(false);
+                setEditingId(null);
                 return;
               }
 
               updateOptimisticBookmark(id, newTitle);
-              setIsEditing(false);
+              setEditingId(null);
               await updateName(id, newTitle);
             }}
             onKeyDown={async (e) => {
               if (e.key === "Escape") {
                 e.preventDefault();
                 e.stopPropagation();
-                setIsEditing(false);
+                setEditingId(null);
                 return;
               }
               if (e.key === "Enter") {
                 e.preventDefault();
                 const newTitle = e.currentTarget.value;
                 updateOptimisticBookmark(id, newTitle);
-                setIsEditing(false);
+                setEditingId(null);
                 await updateName(id, newTitle);
               }
             }}
@@ -315,7 +348,7 @@ function BookmarkItem({
             size="xs"
             className="text-gray-500 hover:bg-gray-100 hover:text-gray-700"
             aria-label="Edit bookmark"
-            onClick={() => setIsEditing((prev) => !prev)}
+            onClick={() => setEditingId(isEditing ? null : id)}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
