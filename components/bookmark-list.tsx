@@ -21,6 +21,7 @@ export function BookmarkList() {
   } = useBookmarks();
 
   const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
+  const lastGPressRef = useRef<number>(0);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -70,6 +71,26 @@ export function BookmarkList() {
           if (prev === null) return 0;
           return Math.max(prev - 1, 0);
         });
+        return;
+      }
+
+      // gg to go to top of list
+      if (e.key === "g" && !e.shiftKey && bookmarks.length > 0) {
+        const now = Date.now();
+        if (now - lastGPressRef.current < 300) {
+          e.preventDefault();
+          setSelectedIndex(0);
+          lastGPressRef.current = 0;
+        } else {
+          lastGPressRef.current = now;
+        }
+        return;
+      }
+
+      // Shift+G to go to bottom of list
+      if (e.key === "G" && e.shiftKey && bookmarks.length > 0) {
+        e.preventDefault();
+        setSelectedIndex(bookmarks.length - 1);
         return;
       }
 
