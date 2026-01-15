@@ -5,6 +5,10 @@
   --foreground: #171717;
 }
 
+.root {
+  isolation: isolate;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -13,4 +17,5 @@
 body {
   background: var(--background);
   color: var(--foreground);
+  position: relative;
 }

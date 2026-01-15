@@ -5,6 +5,7 @@ import { saveLinkToDB } from "@/lib/actions";
 import { useBookmarks } from "@/components/providers/bookmarks-provider";
 import { isUrl, transformUrl } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 export function SearchBar() {
   const searchInputRef = React.useRef<HTMLInputElement>(null);
@@ -14,6 +15,7 @@ export function SearchBar() {
     useBookmarks();
 
   const [state, action] = React.useActionState(saveLinkToDB, null);
+  const notDesktop = useMediaQuery("(max-width: 1023px)");
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Escape") {
@@ -73,7 +75,11 @@ export function SearchBar() {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Search or paste URL (Press '/' to focus)"
+        placeholder={
+          notDesktop
+            ? "Search or paste URL"
+            : "Search or paste URL (Press ? for help)"
+        }
         className="h-10 w-full px-4 py-2 text-base"
       />
       {state && !state.success && state.message && (
