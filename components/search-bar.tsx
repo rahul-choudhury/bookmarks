@@ -5,7 +5,6 @@ import { saveLinkToDB } from "@/lib/actions";
 import { useBookmarks } from "@/components/providers/bookmarks-provider";
 import { isUrl, transformUrl } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { useMediaQuery } from "@/hooks/use-media-query";
 
 export function SearchBar() {
   const searchInputRef = React.useRef<HTMLInputElement>(null);
@@ -15,7 +14,6 @@ export function SearchBar() {
     useBookmarks();
 
   const [state, action] = React.useActionState(saveLinkToDB, null);
-  const notDesktop = useMediaQuery("(max-width: 1023px)");
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Escape") {
@@ -69,19 +67,20 @@ export function SearchBar() {
 
   return (
     <div className="space-y-2">
-      <Input
-        ref={searchInputRef}
-        name="search"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder={
-          notDesktop
-            ? "Search or paste URL"
-            : "Search or paste URL (Press ? for help)"
-        }
-        className="h-10 w-full px-4 py-2 text-base"
-      />
+      <div className="relative">
+        <Input
+          ref={searchInputRef}
+          name="search"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Search or paste URL"
+          className={`peer h-10 w-full px-4 py-2 text-base ${searchTerm ? "lg:pr-44 lg:focus:pr-4" : ""}`}
+        />
+        <span className="pointer-events-none absolute top-1/2 right-4 hidden -translate-y-1/2 text-sm text-gray-400 lg:inline lg:peer-focus:hidden">
+          Press ? for help
+        </span>
+      </div>
       {state && !state.success && state.message && (
         <p className="text-sm text-red-500">{state.message}</p>
       )}
