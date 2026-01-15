@@ -16,6 +16,12 @@ export function SearchBar() {
   const [state, action] = React.useActionState(saveLinkToDB, null);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Tab") {
+      e.preventDefault();
+      searchInputRef.current?.blur();
+      return;
+    }
+
     if (e.key === "Escape") {
       const now = Date.now();
       if (now - lastEscPressRef.current < 300) {

@@ -20,6 +20,7 @@ const shortcuts = [
       { keys: ["/"], description: "Focus search" },
       { keys: ["Esc ×2"], description: "Clear search" },
       { keys: ["Enter"], description: "Add URL (when URL entered)" },
+      { keys: ["Tab"], description: "Lose focus from search" },
     ],
   },
   {
