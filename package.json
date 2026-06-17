@@ -6,20 +6,39 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "NODE_ENV=development drizzle-kit push",
+    "db:migrate": "NODE_ENV=production drizzle-kit migrate"
   },
   "dependencies": {
+    "@rahul-choudhury/ui": "^0.1.0",
+    "better-auth": "^1.6.2",
+    "drizzle-orm": "0.45.2",
     "next": "16.2.9",
+    "pg": "^8.18.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "server-only": "^0.0.1",
+    "unfurl.js": "^6.4.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@next/env": "16.2.9",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pg": "^8.16.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "prettier": "^3.8.2",
+    "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   },
