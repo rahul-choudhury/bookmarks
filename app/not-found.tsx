@@ -1,5 +1,5 @@
-import { NotFound } from "@rahul-choudhury/ui/components"
-import Link from "next/link"
+import { NotFound } from "@rahul-choudhury/ui/components";
+import Link from "next/link";
 
 export default function NotFoundPage() {
   return (
@@ -15,5 +15,5 @@ export default function NotFoundPage() {
         }
       />
     </div>
-  )
+  );
 }

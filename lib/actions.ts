@@ -1,252 +1,161 @@
-"use server"
+"use server";
 
-import { and, desc, eq } from "drizzle-orm"
-import { revalidatePath } from "next/cache"
-import { unfurl } from "unfurl.js"
-import z from "zod"
-import { getDb } from "@/lib/db"
-import { bookmarksTable } from "@/lib/db/bookmarks"
-import { verifySession } from "./dal"
-import { transformUrl } from "./utils"
+import { requireUser } from "./session";
+import { revalidatePath } from "next/cache";
+import z from "zod";
+import { deleteBookmarksById } from "./db/delete-bookmarks";
+import { getDb } from "@/lib/db";
+import { insertBookmarkSql } from "@/lib/db/bookmarks";
+import { getLinkMetadata, getOgImage } from "./metadata";
+import { transformUrl } from "./utils";
 
-const bookmarkSchema = z.array(
-  z.object({
-    url: z.string(),
-    title: z.union([z.string(), z.null()]),
-    favicon: z.union([z.string(), z.null()]),
-    timeStamp: z.iso.datetime(),
-  })
-)
-
-export async function importBookmarks(_state: unknown, formData: FormData) {
-  const session = await verifySession()
-  if (!session) {
+export async function saveLinkToDB(payload: { url: string; title?: string }) {
+  const user = await requireUser();
+  const parsed = z
+    .object({
+      url: z.string().trim().min(1).max(4096),
+      title: z.string().trim().max(500).optional(),
+    })
+    .safeParse(payload);
+  if (!parsed.success)
     return {
       success: false,
-      message: "Unauthorized.",
-    }
-  }
-
-  const json = formData.get("json")
-  if (
-    !json ||
-    typeof json === "string" ||
-    !json.type?.startsWith("application/json")
-  ) {
-    return {
-      success: false,
-      message: "Invalid/No file found.",
-    }
-  }
-
-  const text = await json.text()
-
-  let data: unknown = null
+      message: "Enter a valid link and a title under 500 characters.",
+    };
+  let url: string;
   try {
-    data = JSON.parse(text)
+    url = transformUrl(parsed.data.url);
   } catch {
-    return {
-      success: false,
-      message: "Invalid/No file found.",
-    }
+    return { success: false, message: "Enter a valid HTTP or HTTPS link." };
   }
-
-  const validatedData = bookmarkSchema.safeParse(data)
-  if (!validatedData.success) {
-    return {
-      success: false,
-      message: "Invalid/No file found.",
-    }
-  }
-
   try {
-    await getDb()
-      .insert(bookmarksTable)
-      .values(
-        validatedData.data.map((item) => ({
-          ...item,
-          timeStamp: new Date(item.timeStamp),
-          userId: session.userId,
-        }))
+    const db = getDb();
+    const existing = db
+      .prepare<[string, string], { url: string }>(
+        "SELECT url FROM bookmarks WHERE url = ? AND user_id = ?",
       )
-      .onConflictDoNothing()
-
-    revalidatePath("/")
-
-    return {
-      success: true,
-      message: "Bookmarks imported successfully.",
-    }
-  } catch {
-    return {
-      success: false,
-      message: "Failed to record data into the database. Try again later.",
-    }
-  }
-}
-
-const saveLinkSchema = z.object({
-  url: z.string(),
-  clientId: z.string().optional(),
-})
-
-export async function saveLinkToDB(
-  _state: unknown,
-  payload: { url: string; clientId?: string }
-) {
-  const session = await verifySession()
-  if (!session) return null
-
-  const parsed = saveLinkSchema.safeParse(payload)
-  if (!parsed.success) {
-    return {
-      success: false,
-      message: "Invalid URL.",
-    }
-  }
-
-  const url = transformUrl(parsed.data.url)
-
-  try {
-    const inserted = await getDb()
-      .insert(bookmarksTable)
-      .values({
-        url,
-        title: null,
-        favicon: null,
-        userId: session.userId,
-      })
-      .onConflictDoNothing()
-      .returning()
-
-    let bookmark = inserted[0] ?? null
-
-    if (!bookmark) {
-      const existing = await getDb()
-        .select()
-        .from(bookmarksTable)
-        .where(
-          and(
-            eq(bookmarksTable.url, url),
-            eq(bookmarksTable.userId, session.userId)
-          )
-        )
-        .orderBy(desc(bookmarksTable.timeStamp))
-        .limit(1)
-      bookmark = existing[0] ?? null
-    }
-
-    if (!bookmark) {
+      .get(url, user.id);
+    if (existing)
       return {
         success: false,
-        message: "Bookmark already exists.",
-      }
-    }
-
-    try {
-      if (bookmark.title === null || bookmark.favicon === null) {
-        const result = await unfurl(url)
-        const nextTitle = bookmark.title ?? result.title ?? null
-        const nextFavicon = bookmark.favicon ?? result.favicon ?? null
-
-        if (nextTitle !== bookmark.title || nextFavicon !== bookmark.favicon) {
-          const updated = await getDb()
-            .update(bookmarksTable)
-            .set({ title: nextTitle, favicon: nextFavicon })
-            .where(eq(bookmarksTable.id, bookmark.id))
-            .returning()
-          bookmark = updated[0] ?? bookmark
-        }
-      }
-    } catch {
-      // Best-effort metadata; keep bookmark as-is if unfurl fails.
-    }
-
-    revalidatePath("/")
-
-    return {
-      success: true,
-      message: "Bookmark saved.",
-      bookmark,
-      clientId: parsed.data.clientId ?? null,
-    }
+        message: "This link is already saved.",
+        existingUrl: existing.url,
+      };
+    const metadata = await getLinkMetadata(url);
+    const bookmark = db.prepare(insertBookmarkSql).run({
+      id: crypto.randomUUID(),
+      userId: user.id,
+      isRead: 0,
+      url,
+      timeStamp: Date.now(),
+      ogImage: getOgImage(metadata, url),
+      title: parsed.data.title || metadata?.title?.slice(0, 500) || null,
+      favicon: metadata?.favicon?.startsWith("https://")
+        ? metadata.favicon
+        : null,
+    }).changes;
+    if (!bookmark)
+      return {
+        success: false,
+        message: "This link is already saved.",
+        existingUrl: url,
+      };
+    revalidatePath("/");
+    return { success: true, message: "Link saved." };
   } catch {
     return {
       success: false,
-      message: "Bookmark already exists.",
-    }
+      message: "Couldn’t save this link. Please try again.",
+    };
   }
 }
 
 export async function deleteBookmark(id: string) {
-  const session = await verifySession()
-  if (!session) return null
-
+  const user = await requireUser();
   try {
-    const result = await getDb()
-      .delete(bookmarksTable)
-      .where(
-        and(
-          eq(bookmarksTable.id, id),
-          eq(bookmarksTable.userId, session.userId)
-        )
-      )
-      .returning({ id: bookmarksTable.id })
-
-    if (result.length === 0) {
-      return {
-        success: false,
-        message: "Bookmark not found or unauthorized.",
-      }
-    }
+    const result = getDb()
+      .prepare("DELETE FROM bookmarks WHERE id = ? AND user_id = ?")
+      .run(id, user.id).changes;
+    if (!result) return { success: false, message: "Bookmark not found." };
+    revalidatePath("/");
+    return { success: true, message: "Link deleted." };
   } catch {
     return {
       success: false,
-      message: "Failed to delete bookmark.",
-    }
-  }
-
-  revalidatePath("/")
-
-  return {
-    success: true,
-    message: "Bookmark deleted.",
+      message: "Couldn’t delete this link. Please try again.",
+    };
   }
 }
 
 export async function updateName(id: string, title: string) {
-  const session = await verifySession()
-  if (!session) return null
-
+  const user = await requireUser();
+  const parsed = z.string().trim().min(1).max(500).safeParse(title);
+  if (!parsed.success)
+    return {
+      success: false,
+      message: "Enter a title between 1 and 500 characters.",
+    };
   try {
-    const result = await getDb()
-      .update(bookmarksTable)
-      .set({ title })
-      .where(
-        and(
-          eq(bookmarksTable.id, id),
-          eq(bookmarksTable.userId, session.userId)
-        )
-      )
-      .returning({ id: bookmarksTable.id })
-
-    if (result.length === 0) {
-      return {
-        success: false,
-        message: "Bookmark not found or unauthorized.",
-      }
-    }
+    const result = getDb()
+      .prepare("UPDATE bookmarks SET title = ? WHERE id = ? AND user_id = ?")
+      .run(parsed.data, id, user.id).changes;
+    if (!result) return { success: false, message: "Bookmark not found." };
+    revalidatePath("/");
+    return { success: true, message: "Changes saved." };
   } catch {
     return {
       success: false,
-      message: "Failed to update bookmark.",
-    }
+      message: "Couldn’t save your changes. Please try again.",
+    };
   }
+}
 
-  revalidatePath("/")
+export async function setBookmarkRead(id: string, isRead: boolean) {
+  const user = await requireUser();
+  if (typeof id !== "string" || typeof isRead !== "boolean")
+    return { success: false, message: "Invalid bookmark status." };
+  try {
+    const result = getDb()
+      .prepare("UPDATE bookmarks SET is_read = ? WHERE id = ? AND user_id = ?")
+      .run(isRead ? 1 : 0, id, user.id);
+    if (!result.changes)
+      return { success: false, message: "Bookmark not found." };
+    revalidatePath("/");
+    return {
+      success: true,
+      message: isRead ? "Marked as read." : "Marked as unread.",
+    };
+  } catch {
+    return {
+      success: false,
+      message: "Couldn’t update reading status. Please try again.",
+    };
+  }
+}
 
-  return {
-    success: true,
-    message: "Bookmark title updated successfully.",
+export async function deleteSelectedBookmarks(ids: string[]) {
+  const user = await requireUser();
+  const parsed = z
+    .array(z.string().min(1).max(100))
+    .min(1)
+    .max(10000)
+    .safeParse(ids);
+  if (!parsed.success)
+    return {
+      success: false,
+      message: "Select between 1 and 10,000 links to delete.",
+    };
+  try {
+    const count = deleteBookmarksById(getDb(), parsed.data, user.id);
+    revalidatePath("/");
+    return {
+      success: true,
+      message: `${count} ${count === 1 ? "link" : "links"} deleted.`,
+    };
+  } catch {
+    return {
+      success: false,
+      message: "Couldn’t delete the selected links. Please try again.",
+    };
   }
 }

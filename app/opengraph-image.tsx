@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { ImageResponse } from "next/og";
 
-export const alt = "Bookmarks - A keyboard-focused bookmark manager";
+export const alt = "Bookmarks";
 export const size = {
   width: 1200,
   height: 630,
@@ -28,31 +28,7 @@ function BookmarksMark() {
 }
 
 function BookmarksSubtitle() {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "12px",
-      }}
-    >
-      <span
-        style={{
-          background: "#f5f5f5",
-          border: "1px solid #e5e5e5",
-          padding: "6px 14px",
-          borderRadius: 8,
-          fontFamily: "JetBrainsMono",
-          fontSize: 18,
-          color: "#737373",
-          letterSpacing: "0.02em",
-        }}
-      >
-        kbd
-      </span>
-      <span>focused bookmark manager</span>
-    </div>
-  );
+  return <span>Save and find bookmarks.</span>;
 }
 
 export default async function Image() {

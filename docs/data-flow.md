@@ -1,20 +1,10 @@
-# Data Flow
+# Data flow
 
-## Request Lifecycle
+1. The server page validates the session and queries only that user’s bookmarks in SQLite in newest-first order.
+2. The client renders the received library and filters titles, URLs, and reading status locally, then displays up to 10 links per page.
+3. Add, edit, individual/batch delete and reading-status controls submit explicit server actions.
+4. Actions validate the session, ownership, and input, write to SQLite and revalidate the page. Failed actions leave the current data intact and show an error.
 
-1. `app/page.tsx` fetches bookmarks server-side (filtered by userId)
-2. User enters a URL or search query in `components/search-bar.tsx`
-3. If URL: optimistic update shows bookmark immediately (with URL as temporary title)
-4. `saveLinkToDB` inserts to DB, fetches metadata, replaces temp bookmark via `REPLACE`
-5. `revalidatePath("/")` syncs server state
+Adding a link normalizes HTTP(S) URLs, checks duplicates, optionally retrieves metadata within a three-second deadline, and inserts with a unique URL constraint. Explicit titles take precedence. Metadata failure does not prevent saving.
 
-## Optimistic Updates
-
-| Action  | Function                    | Behavior                                     |
-| ------- | --------------------------- | -------------------------------------------- |
-| Add     | `addOptimisticBookmark`     | Immediately shows new bookmark               |
-| Replace | `replaceOptimisticBookmark` | Swaps temp bookmark with server-returned one |
-| Edit    | `updateOptimisticBookmark`  | Immediately updates title                    |
-| Delete  | `deleteOptimisticBookmark`  | Immediately removes from list                |
-
-Updates resolve when server action completes and `revalidatePath("/")` refreshes data.
+Selection is client state retained across pages, cleared by search/tab changes or cancellation. Batch deletion validates IDs and runs parameterized deletes in one transaction; a failure rolls back the entire batch.
