@@ -1,0 +1,43 @@
+app = "rchoudhury-bookmarks"
+primary_region = "sin"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[deploy]
+  strategy = "immediate"
+
+[env]
+  BETTER_AUTH_URL = "https://bookmarks.rchoudhury.dev"
+  HOSTNAME = "0.0.0.0"
+  NEXT_TELEMETRY_DISABLED = "1"
+  NODE_ENV = "production"
+  PORT = "3000"
+  SQLITE_PATH = "/data/bookmarks.db"
+
+[[mounts]]
+  source = "bookmarks_data"
+  destination = "/data"
+  auto_extend_size_threshold = 80
+  auto_extend_size_increment = "1GB"
+  auto_extend_size_limit = "10GB"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [[http_service.checks]]
+    grace_period = "15s"
+    interval = "30s"
+    method = "GET"
+    path = "/login"
+    timeout = "5s"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory = "1gb"

@@ -17,6 +17,7 @@ export function createAuth() {
     baseURL,
     secret: process.env.BETTER_AUTH_SECRET,
     database: getDb(),
+    advanced: { ipAddress: { ipAddressHeaders: ["fly-client-ip"] } },
     emailAndPassword: { enabled: false },
     rateLimit: { enabled: true },
     plugins: [
